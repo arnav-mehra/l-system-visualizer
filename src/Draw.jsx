@@ -10,10 +10,7 @@ const Draw = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const canvas_ctx = canvas.getContext("2d");
-    canvas_ctx.lineWidth = "2";
-    canvas_ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawTurtleInstrs(canvas_ctx, str, drawInitCtx, drawInstrs);
+    drawTurtleInstrs(canvas, str, drawInitCtx, drawInstrs);
   }, [drawInitCtx, drawInstrs, str]);
 
   return (

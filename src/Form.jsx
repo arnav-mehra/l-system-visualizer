@@ -72,6 +72,9 @@ const Form = ({
           <button onClick={handleDecDepth}>
             -
           </button>
+          <div>
+            {strs.ptr}
+          </div>
           <button onClick={handleIncDepth}>
             +
           </button>
