@@ -1,35 +1,14 @@
 import { useState } from 'react';
-import { getNext } from './ok';
+import { DEF_DRAW_INSTRS, DEF_STRS, DEF_RULES, DEF_DRAW_INIT_CTX } from './ok';
 import Draw from './Draw';
-import './App.css';
 import Form from './Form';
+import './App.css';
 
 const App = () => {
-  const [ strs, setStrs ] = useState({
-    ptr: 0,
-    cache: ["a"]
-  });
-
-  const [ rules, setRules ] = useState({
-    "a": "ab",
-    "b": "a"
-  });
-
-  const [ drawInstr, setDrawInstr ] = useState({
-    base: {
-      ctx: { len: 10, angle: 0 }
-    },
-    instr: {
-      "a": {
-        function: (ctx) => ([ "turn", ctx.angle ]),
-        ctx: (ctx) => ({ ...ctx, len: ctx.len / 2 })
-      },
-      "b": {
-        function: (ctx) => ([ "turn", ctx.angle ]),
-        ctx: (ctx) => ({ ...ctx, len: ctx.len / 2 })
-      }
-    }
-  });
+  const [ strs, setStrs ] = useState(DEF_STRS);
+  const [ rules, setRules ] = useState(DEF_RULES);
+  const [ drawInstrs, setDrawInstrs ] = useState(DEF_DRAW_INSTRS);
+  const [ drawInitCtx, setDrawInitCtx ] = useState(DEF_DRAW_INIT_CTX);
 
   return (
     <div
@@ -47,16 +26,15 @@ const App = () => {
         setStrs={setStrs}
         rules={rules}
         setRules={setRules}
-        drawInstr={drawInstr}
-        setDrawInstr={setDrawInstr}
+        drawInstrs={drawInstrs}
+        setDrawInstrs={setDrawInstrs}
+        drawInitCtx={drawInitCtx}
+        setDrawInitCtx={setDrawInitCtx}
       />
 
-      <div>
-        {strs.cache[strs.ptr]}
-      </div>
-
       <Draw
-        drawInstr={drawInstr}
+        drawInstrs={drawInstrs}
+        drawInitCtx={drawInitCtx}
         str={strs.cache[strs.ptr]}
       />
     </div>
