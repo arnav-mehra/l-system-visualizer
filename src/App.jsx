@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { DEF_DRAW_INSTRS, DEF_STRS, DEF_RULES, DEF_DRAW_INIT_CTX } from './ok';
+import { DEF_DRAW_INSTRS, DEF_STRS, DEF_RULES, DEF_DRAW_INIT_CTX } from './script';
 import Draw from './Draw';
-import Form from './Form';
+import Form from './form/Form';
 import './App.css';
 
 const App = () => {
@@ -12,15 +12,20 @@ const App = () => {
 
   return (
     <div
+      className="flex-col"
       style={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        width: "100vw",
-        gap: "20px",
-        padding: "10px"
+        margin: "10px"
       }}
     >
+      <div style={{ textAlign: "center", width: "100%" }}>
+        <h2>
+          L-System Visualizer
+        </h2>
+        <h4>
+          Arnav Mehra
+        </h4>
+      </div>
+
       <Form
         strs={strs}
         setStrs={setStrs}

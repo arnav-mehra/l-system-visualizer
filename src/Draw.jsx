@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { drawTurtleInstrs } from "./ok";
+import { drawTurtleInstrs } from "./script";
+import Drawer from "./Drawer";
 
 const Draw = ({
   drawInstrs,
@@ -10,20 +11,30 @@ const Draw = ({
 
   useEffect(() => {
     const canvas = canvasRef.current;
+
+    canvas.width = canvas.clientWidth * 3;
+    canvas.height = canvas.clientHeight * 3;
     drawTurtleInstrs(canvas, str, drawInitCtx, drawInstrs);
   }, [drawInitCtx, drawInstrs, str]);
 
   return (
-    <canvas
-      width="2400"
-      height="2400"
-      style={{
-        width: "800px",
-        height: "800px",
-        border: "1px solid black"
-      }}
-      ref={canvasRef}
-    />
+    <>
+      <Drawer
+        label="Drawing"
+        startOpen={true}
+      >
+        <canvas
+          style={{
+            width: "100%",
+            height: "800px",
+            border: "1px solid black"
+          }}
+          ref={canvasRef}
+        />
+      </Drawer>
+
+      <div className="divider"/>
+    </>
   )
 };
 

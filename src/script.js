@@ -1,18 +1,23 @@
-const ActionTypes = {
+export const InstrTypes = {
     DRAW_LINE: "draw_line",
     TRANSFORM_CTX: "transform_ctx",
     PUSH_CTX: "push_ctx",
     POP_CTX: "pop_ctx"
 }
 
-export class Action {
-    constructor(type, fn) {
+export class Instr {
+    constructor(type, fn_str) {
         this.type = type;
-        this.fn = fn;
+        this.fn_str = fn_str;
+        try {
+            this.fn = eval(fn_str);
+        } catch (err) {
+            alert("Bad Instruction Function: ", err);
+        }
     }
 }
 
-const DEF_AXIOM = "0";
+export const DEF_AXIOM = "0";
 
 export const DEF_STRS = {
     ptr: 0,
@@ -32,29 +37,29 @@ export const DEF_DRAW_INIT_CTX = {
 
 export const DEF_DRAW_INSTRS = {
     "0": [
-        new Action(
-            ActionTypes.DRAW_LINE,
-            (ctx) => ([ ctx.angle, ctx.len ])
+        new Instr(
+            InstrTypes.DRAW_LINE,
+            "(ctx) => ([ ctx.angle, ctx.len ])"
         )
     ],
     "1": [
-        new Action(
-            ActionTypes.DRAW_LINE,
-            (ctx) => ([ ctx.angle, ctx.len ])
+        new Instr(
+            InstrTypes.DRAW_LINE,
+            "(ctx) => ([ ctx.angle, ctx.len ])"
         )
     ],
     "[": [
-        new Action(ActionTypes.PUSH_CTX),
-        new Action(
-            ActionTypes.TRANSFORM_CTX,
-            (ctx) => ({ ...ctx, angle: ctx.angle + 45 })
+        new Instr(InstrTypes.PUSH_CTX, "null"),
+        new Instr(
+            InstrTypes.TRANSFORM_CTX,
+            "(ctx) => ({ ...ctx, angle: ctx.angle + 45 })"
         )
     ],
     "]": [
-        new Action(ActionTypes.POP_CTX),
-        new Action(
-            ActionTypes.TRANSFORM_CTX,
-            (ctx) => ({ ...ctx, angle: ctx.angle - 45 })
+        new Instr(InstrTypes.POP_CTX, "null"),
+        new Instr(
+            InstrTypes.TRANSFORM_CTX,
+            "(ctx) => ({ ...ctx, angle: ctx.angle - 45 })"
         )
     ]
 }
@@ -74,14 +79,16 @@ export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
     let lines = [];
 
     for (const ch of str) {
-        for (const action of draw_instr[ch]) {
-            switch (action.type) {
-                case ActionTypes.TRANSFORM_CTX: {
-                    curr_ctx = action.fn(curr_ctx);
+        if (!draw_instr[ch]) continue;
+
+        for (const instr of draw_instr[ch]) {
+            switch (instr.type) {
+                case InstrTypes.TRANSFORM_CTX: {
+                    curr_ctx = instr.fn(curr_ctx);
                     break;
                 }
-                case ActionTypes.DRAW_LINE: {
-                    const [ angle, len ] = action.fn(curr_ctx);
+                case InstrTypes.DRAW_LINE: {
+                    const [ angle, len ] = instr.fn(curr_ctx);
                     const new_pos = [
                         Math.cos(angle * Math.PI / 180) * len + curr_ctx.pos[0],
                         Math.sin(angle * Math.PI / 180) * len + curr_ctx.pos[1]
@@ -90,11 +97,11 @@ export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
                     curr_ctx = { ...curr_ctx, pos: new_pos };
                     break;
                 }
-                case ActionTypes.PUSH_CTX: {
+                case InstrTypes.PUSH_CTX: {
                     stack.push(curr_ctx);
                     break;
                 }
-                case ActionTypes.POP_CTX: {
+                case InstrTypes.POP_CTX: {
                     curr_ctx = stack.pop();
                     break;
                 }
@@ -102,11 +109,7 @@ export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
         }
     }
 
-    console.log({lines})
-
     const gl = canvas.getContext("webgl");
-
-    gl.lineWidth = 4.0;
 
     const vertices = new Float32Array(lines);
     const vertex_buffer = gl.createBuffer();

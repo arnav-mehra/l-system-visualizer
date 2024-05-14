@@ -1,0 +1,105 @@
+body {
+    margin: 0;
+}
+
+#root {
+    display: flex;
+    flex-direction: column;
+}
+
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div.flex-row {
+    display: flex;
+    gap: 8px;
+}
+
+div.flex-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+div.divider {
+    border: 1px solid lightgray;
+}
+
+button {
+    cursor: pointer;
+}
+
+.text {
+    line-height: 30px;
+}
+
+.form-label {
+    width: 100px;
+}
+
+button,
+textarea,
+input,
+select {
+    padding: 8px;
+    background: white;
+    border: 1px solid gray;
+    border-radius: 6px;
+}
+
+button:hover,
+textarea:hover,
+input:hover,
+select:hover {
+    border: 1px solid #4096ff;
+    color: #4096ff;
+}
+
+button.blue,
+textarea.blue,
+input.blue,
+select.blue {
+    border: 1px solid #1677ff;
+    color: #1677ff;
+}
+
+button.blue:hover,
+textarea.blue:hover,
+input.blue:hover,
+select.blue:hover {
+    border: 1px solid #69b1ff;
+    color: #69b1ff;
+}
+
+button.green,
+textarea.green,
+input.green,
+select.green {
+    border: 1px solid #52c41a;
+    color: #52c41a;
+}
+
+button.green:hover,
+textarea.green:hover,
+input.green:hover,
+select.green:hover {
+    border: 1px solid #73d13d;
+    color: #73d13d;
+}
+
+button.red,
+textarea.red,
+input.red,
+select.red {
+    border: 1px solid #f5222d;
+    color: #f5222d;
+}
+
+button.red:hover,
+textarea.red:hover,
+input.red:hover,
+select.red:hover {
+    border: 1px solid #ff4d4f;
+    color: #ff4d4f;
+}

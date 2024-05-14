@@ -13,26 +13,36 @@ const JsonEditor = ({
     };
 
     return (
-        <div style={{ display: "flex", gap: "8px" }}>
-            <div>
+        <div className="flex-row">
+            <div className="text form-label">
                 {label}
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div className="flex-col">
                 {objEnts.map(([ key, val ], i) => (
-                    <div style={{ display: "flex", gap: "8px" }}>
+                    <div className="flex-row">
                         <input
+                            // style={{ width: "16px", textAlign: "center" }}
                             value={key}
                             onChange={e => {
-                                objEnts[i] = [e.target.value, objEnts[i][1]];
+                                objEnts[i] = [ e.target.value, objEnts[i][1] ];
                                 setObjEnts([ ...objEnts ]);
                             }}
                         />
-                        <div>{"=>"}</div>
+                        
+                        <div className="text">
+                            {"=>"}
+                        </div>
+
                         <input
-                            value={val}
+                            value={
+                                val instanceof Array ? "[" + val.toString() + "]"
+                                : val instanceof String ? "\"" + val + "\""
+                                : val.toString()
+                            }
                             onChange={e => {
-                                objEnts[i] = [objEnts[i][0], e.target.value ];
+                                const val = eval(e.target.value);
+                                objEnts[i] = [ objEnts[i][0], val ];
                                 setObjEnts([ ...objEnts ]);
                             }}
                         />
@@ -41,6 +51,7 @@ const JsonEditor = ({
                                 objEnts.splice(i, 1);
                                 setObjEnts([ ...objEnts ]);
                             }}
+                            className="red"
                         >
                             Delete
                         </button>
@@ -52,11 +63,15 @@ const JsonEditor = ({
                         onClick={_ => {
                             setObjEnts([ ...objEnts, [ "", "" ] ]);
                         }}
+                        className="green"
                     >
                         Add
                     </button>
                     
-                    <button onClick={handleSubmit}>
+                    <button 
+                        onClick={handleSubmit}
+                        className="blue"
+                    >
                         Save
                     </button>
                 </div>
