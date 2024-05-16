@@ -26,6 +26,10 @@ div.divider {
     border: 1px solid lightgray;
 }
 
+div.light-divider {
+    border: 1px solid #EEEEEE;
+}
+
 button {
     cursor: pointer;
 }
@@ -46,6 +50,7 @@ select {
     background: white;
     border: 1px solid gray;
     border-radius: 6px;
+    min-width: 32px;
 }
 
 button:hover,

@@ -17,53 +17,6 @@ export class Instr {
     }
 }
 
-export const DEF_AXIOM = "0";
-
-export const DEF_STRS = {
-    ptr: 0,
-    cache: [ DEF_AXIOM ]
-};
-
-export const DEF_RULES = {
-    "0": "1[0]0",
-    "1": "11"
-};
-
-export const DEF_DRAW_INIT_CTX = {
-    len: 0.1,
-    angle: 90.0,
-    pos: [ 0.0, -1.0 ]
-};
-
-export const DEF_DRAW_INSTRS = {
-    "0": [
-        new Instr(
-            InstrTypes.DRAW_LINE,
-            "(ctx) => ([ ctx.angle, ctx.len ])"
-        )
-    ],
-    "1": [
-        new Instr(
-            InstrTypes.DRAW_LINE,
-            "(ctx) => ([ ctx.angle, ctx.len ])"
-        )
-    ],
-    "[": [
-        new Instr(InstrTypes.PUSH_CTX, "null"),
-        new Instr(
-            InstrTypes.TRANSFORM_CTX,
-            "(ctx) => ({ ...ctx, angle: ctx.angle + 45 })"
-        )
-    ],
-    "]": [
-        new Instr(InstrTypes.POP_CTX, "null"),
-        new Instr(
-            InstrTypes.TRANSFORM_CTX,
-            "(ctx) => ({ ...ctx, angle: ctx.angle - 45 })"
-        )
-    ]
-}
-
 export const getNext = (str, rules) => {
     let res = "";
     for (const ch of str) {

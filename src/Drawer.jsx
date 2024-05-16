@@ -9,6 +9,8 @@ const Drawer = ({
 
     return (
         <div className="flex-col">
+            <div className="divider"/>
+
             <div
                 className="flex-row"
                 style={{
@@ -29,9 +31,18 @@ const Drawer = ({
                 </button>
             </div>
 
-            {isOpen &&
-                children
-            }
+            {isOpen && (
+                <div
+                    className="flex-col"
+                    style={{ margin: "0 16px" }}
+                >
+                    <div className="light-divider"/>
+                    {children}
+                    <div className="light-divider"/>
+                </div>
+            )}
+
+            {/* <div className="divider"/> */}
         </div>
     );
 };

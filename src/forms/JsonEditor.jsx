@@ -1,14 +1,36 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const JsonEditor = ({
     obj,
     label,
     onSubmit
 }) => {
-    const [ objEnts, setObjEnts ] = useState(Object.entries(obj));
+    const [ objEnts, setObjEnts ] = useState([]);
+
+    useEffect(() => {
+        setObjEnts(
+            Object
+                .entries(obj)
+                .map(([key, val]) => ([
+                    key,
+                    val instanceof Array ? "[" + val.toString() + "]"
+                        : typeof val === "string" ? "\"" + val + "\""
+                        : val
+                ]))
+        );
+    }, [obj]);
 
     const handleSubmit = () => {
-        const new_obj = Object.fromEntries(objEnts);
+        const new_obj_ents = objEnts.map(([ key, val ]) => {
+            try {
+                return [ key, eval(val) ];
+            }
+            catch (err) {
+                alert("Invalid entry value: " + val);
+                return [ key, obj[key] || 0 ];
+            }
+        });
+        const new_obj = Object.fromEntries(new_obj_ents);
         onSubmit(new_obj);
     };
 
@@ -20,7 +42,7 @@ const JsonEditor = ({
 
             <div className="flex-col">
                 {objEnts.map(([ key, val ], i) => (
-                    <div className="flex-row">
+                    <div className="flex-row" key={key}>
                         <input
                             // style={{ width: "16px", textAlign: "center" }}
                             value={key}
@@ -31,18 +53,13 @@ const JsonEditor = ({
                         />
                         
                         <div className="text">
-                            {"=>"}
+                            &rarr;
                         </div>
 
                         <input
-                            value={
-                                val instanceof Array ? "[" + val.toString() + "]"
-                                : val instanceof String ? "\"" + val + "\""
-                                : val.toString()
-                            }
+                            value={val}
                             onChange={e => {
-                                const val = eval(e.target.value);
-                                objEnts[i] = [ objEnts[i][0], val ];
+                                objEnts[i] = [ objEnts[i][0], e.target.value ];
                                 setObjEnts([ ...objEnts ]);
                             }}
                         />

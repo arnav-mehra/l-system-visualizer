@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { InstrTypes } from '../script';
+import { InstrTypes } from '../script/logic';
 
 const InstrEditor = ({
     instr,
@@ -16,7 +16,12 @@ const InstrEditor = ({
                 onChange={e => setTypeForm(e.target.value)}
             >
                 {Object.entries(InstrTypes).map(([type_enum, type]) => (
-                    <option value={type}>{type_enum}</option>
+                    <option
+                        value={type}
+                        key={type}
+                    >
+                        {type_enum}
+                    </option>
                 ))}
             </select>
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Instr, InstrTypes } from "../script";
+import { Instr, InstrTypes } from "../script/logic";
 import InstrEditor from "./InstrEditor";
 
 const InstrsEditor = ({
@@ -26,7 +26,11 @@ const InstrsEditor = ({
 
             <div className="flex-col">
                 {objEnts.map(([key, instr_arr], ent_idx) => (
-                    <div className="flex-row" style={{ alignItems: "start" }}>
+                    <div
+                        className="flex-row"
+                        style={{ alignItems: "start" }}
+                        key={key}
+                    >
                         <input
                             style={{ width: '16px', textAlign: "center" }}
                             value={key}
@@ -37,12 +41,13 @@ const InstrsEditor = ({
                         />
 
                         <div className="text">
-                            {"=>"}
+                            &rarr;
                         </div>
 
                         <div className="flex-col">
                             {instr_arr.map((instr, instr_idx) => (
                                 <InstrEditor
+                                    key={instr.type + ":" + instr.fn_str + ":" + instr_idx}
                                     instr={instr}
                                     setInstr={(new_type, new_fn_str) => {
                                         const new_action = new Instr(new_type, new_fn_str);
@@ -70,7 +75,7 @@ const InstrsEditor = ({
                                     }}
                                     className="green"
                                 >
-                                    Add Instr
+                                    Add
                                 </button>
 
                                 <button
@@ -84,7 +89,7 @@ const InstrsEditor = ({
                                 </button>
                             </div>
                             
-                            <div className="divider"/>
+                            <div className="light-divider"/>
                         </div>
                     </div>
                 ))}
