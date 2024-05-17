@@ -1,5 +1,6 @@
+import * as THREE from 'three';
 import { useEffect, useRef } from "react";
-import { drawTurtleInstrs } from "../script/logic";
+import { drawLinesThreeJs, getTurtleLines } from "../script/logic";
 import Drawer from "../Drawer";
 
 const Drawing = ({
@@ -7,30 +8,47 @@ const Drawing = ({
   drawInitCtx,
   str
 }) => {
-  const canvasRef = useRef();
+  const canvasWrapperRef = useRef();
+  const rendererRef = useRef();
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (rendererRef.current) return;
     
-    canvas.width = canvas.clientWidth * 3;
-    canvas.height = canvas.clientHeight * 3;
-    drawTurtleInstrs(canvas, str, drawInitCtx, drawInstrs);
-  }, [drawInitCtx, drawInstrs, str, canvasRef]);
+    const canvas_wrapper = canvasWrapperRef.current;
+    if (!canvas_wrapper) return;
+    
+    const width = canvas_wrapper.offsetWidth;
+    const height = canvas_wrapper.offsetHeight;
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(width, height);
+    canvas_wrapper.appendChild(renderer.domElement);
+
+    rendererRef.current = renderer;
+  }, []);
+
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+
+    const lines = getTurtleLines(str, drawInitCtx, drawInstrs);
+    drawLinesThreeJs(renderer, lines);
+  }, [drawInitCtx, drawInstrs, str, canvasWrapperRef]);
 
   return (
     <Drawer
       label="Drawing"
       startOpen={true}
     >
-      <canvas
+      <div
+        ref={canvasWrapperRef}
         style={{
           width: "100%",
           height: "800px",
           border: "1px solid black"
         }}
-        ref={canvasRef}
-      />
+      >
+      </div>
     </Drawer>
   )
 };

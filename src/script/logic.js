@@ -1,9 +1,11 @@
+import * as THREE from 'three';
+
 export const InstrTypes = {
     DRAW_LINE: "draw_line",
     TRANSFORM_CTX: "transform_ctx",
     PUSH_CTX: "push_ctx",
     POP_CTX: "pop_ctx"
-}
+};
 
 export class Instr {
     constructor(type, fn_str) {
@@ -25,11 +27,11 @@ export const getNext = (str, rules) => {
     return res;
 };
 
-export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
+export const getTurtleLines = (str, init_ctx, draw_instr) => {
+    let lines = [];
+
     let curr_ctx = { ...init_ctx };
     let stack = [];
-
-    let lines = [];
 
     for (const ch of str) {
         if (!draw_instr[ch]) continue;
@@ -41,12 +43,18 @@ export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
                     break;
                 }
                 case InstrTypes.DRAW_LINE: {
-                    const [ angle, len ] = instr.fn(curr_ctx);
+                    const [ len, phi, theta ] = instr.fn(curr_ctx);
+
+                    const sin_theta = Math.sin(theta * Math.PI / 180);
+                    const cos_theta = Math.cos(theta * Math.PI / 180);
+                    const cos_phi = Math.cos(phi * Math.PI / 180);
+
                     const new_pos = [
-                        Math.cos(angle * Math.PI / 180) * len + curr_ctx.pos[0],
-                        Math.sin(angle * Math.PI / 180) * len + curr_ctx.pos[1]
+                        len * sin_theta * cos_phi + curr_ctx.pos[0],
+                        len * sin_theta * cos_phi + curr_ctx.pos[1],
+                        len * cos_theta + curr_ctx.pos[2]
                     ];
-                    lines.push(...curr_ctx.pos, 0.0, ...new_pos, 0.0);
+                    lines.push([ curr_ctx.pos, new_pos ]);
                     curr_ctx = { ...curr_ctx, pos: new_pos };
                     break;
                 }
@@ -62,9 +70,13 @@ export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
         }
     }
 
+    return lines;
+};
+
+export const drawLinesWebGL = (canvas, lines) => {
     const gl = canvas.getContext("webgl");
 
-    const vertices = new Float32Array(lines);
+    const vertices = new Float32Array(lines.flat());
     const vertex_buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
@@ -106,4 +118,45 @@ export const drawTurtleInstrs = (canvas, str, init_ctx, draw_instr) => {
     gl.viewport(0, 0, canvas.width, canvas.height);
 
     gl.drawArrays(gl.LINES, 0, lines.length / 3);
-}
+};
+
+export const drawLinesThreeJs = (renderer, lines) => {
+    const size = new THREE.Vector2();
+    renderer.getSize(size);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight /*size[0] / size[1]*/, 0.1, 1000);
+
+    lines.forEach(([ from_pos, to_pos ]) => {
+        const pos = [ 
+            (from_pos[0] + to_pos[0]) / 2,
+            (from_pos[1] + to_pos[1]) / 2,
+            (from_pos[2] + to_pos[2]) / 2
+        ];
+        const dir = [ 
+            to_pos[0] - from_pos[0],
+            to_pos[1] - from_pos[1],
+            to_pos[2] - from_pos[2]
+        ];
+        const len = Math.sqrt(
+              dir[0] * dir[0]
+            + dir[1] * dir[1]
+            + dir[2] * dir[2]
+        );
+        const rad = 0.1;
+        
+        const geometry = new THREE.CylinderGeometry(rad, rad, len);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
+        const cylinder = new THREE.Mesh(geometry, material);
+        cylinder.position.set(pos[0], pos[2], pos[1]);
+        // cylinder.lookAt(dir);
+
+        scene.add(cylinder);
+    });
+
+    camera.position.z = 5;
+
+    renderer.render(scene, camera);
+
+    console.log({renderer})
+};

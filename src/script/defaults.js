@@ -9,19 +9,19 @@ export const FRACTAL_TREE = {
     draw_init_ctx: {
         len: 0.05,
         angle: 90.0,
-        pos: [ 0.0, -1.0 ]
+        pos: [ 0.0, -1.0, 0.0 ]
     },
     draw_instrs: {
         "0": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.angle, ctx.len ])"
+                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
             )
         ],
         "1": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.angle, ctx.len ])"
+                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
             )
         ],
         "[": [
@@ -49,13 +49,13 @@ export const KOCH_CURVE = {
     draw_init_ctx: {
         len: 0.05,
         angle: 0.0,
-        pos: [ -1.0, 0.0 ]
+        pos: [ -1.0, 0.0, 0.0 ]
     },
     draw_instrs: {
         "F": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.angle, ctx.len ])"
+                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
             )
         ],
         "-": [
@@ -82,19 +82,19 @@ export const SIERPINSKI_TRI = {
     draw_init_ctx: {
         len: 0.05,
         angle: 180.0,
-        pos: [ 0.75, -0.75 ]
+        pos: [ 0.75, -0.75, 0.0 ]
     },
     draw_instrs: {
         "F": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.angle, ctx.len ])"
+                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
             )
         ],
         "G": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.angle, ctx.len ])"
+                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
             )
         ],
         "-": [
@@ -121,13 +121,13 @@ export const FRACTAL_PLANT = {
     draw_init_ctx: {
         len: 0.01,
         angle: 45.0,
-        pos: [ -0.75, -0.75 ]
+        pos: [ -0.75, -0.75, 0.0 ]
     },
     draw_instrs: {
         "F": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.angle, ctx.len ])"
+                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
             )
         ],
         "[": [
