@@ -48,11 +48,12 @@ export const getTurtleLines = (str, init_ctx, draw_instr) => {
                     const sin_theta = Math.sin(theta * Math.PI / 180);
                     const cos_theta = Math.cos(theta * Math.PI / 180);
                     const cos_phi = Math.cos(phi * Math.PI / 180);
+                    const sin_phi = Math.sin(phi * Math.PI / 180);
 
                     const new_pos = [
                         len * sin_theta * cos_phi + curr_ctx.pos[0],
-                        len * sin_theta * cos_phi + curr_ctx.pos[1],
-                        len * cos_theta + curr_ctx.pos[2]
+                        len * sin_theta * sin_phi + curr_ctx.pos[1],
+                        len * cos_theta           + curr_ctx.pos[2]
                     ];
                     lines.push([ curr_ctx.pos, new_pos ]);
                     curr_ctx = { ...curr_ctx, pos: new_pos };
@@ -73,90 +74,107 @@ export const getTurtleLines = (str, init_ctx, draw_instr) => {
     return lines;
 };
 
-export const drawLinesWebGL = (canvas, lines) => {
-    const gl = canvas.getContext("webgl");
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
-    const vertices = new Float32Array(lines.flat());
-    const vertex_buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+let scene = null;
+let anim_ref = null;
+let time = 0;
 
-    var vertCode = `
-        attribute vec3 coordinates;
-        void main(void) {
-            gl_Position = vec4(coordinates, 1.0);
-        }
-    `;
-    var vertShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vertShader, vertCode);
-    gl.compileShader(vertShader);
+export const initScene = (lines) => {
+    const group = new THREE.Group();
 
-    var fragCode = `
-        void main(void) {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-        }
-    `;
-    var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fragShader, fragCode);
-    gl.compileShader(fragShader);
+    lines.forEach(([ from_pos, to_pos ]) => {
+        const points = [
+            new THREE.Vector3(from_pos[0], from_pos[1], from_pos[2]),
+            new THREE.Vector3(to_pos[0], to_pos[1], to_pos[2])
+        ];
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); 
+        const line = new THREE.Line(geometry, material);
+        group.add(line);
+    });
 
-    var shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertShader);
-    gl.attachShader(shaderProgram, fragShader);
-    gl.linkProgram(shaderProgram);
-    gl.useProgram(shaderProgram);
+    const bbox = new THREE.Box3().setFromObject(group);
+    const center = new THREE.Vector3();
+    bbox.getCenter(center);
+    group.position.set(-center.x, -center.y, -center.z);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-    var coord = gl.getAttribLocation(shaderProgram, "coordinates");
-    gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(coord);
-
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
-    gl.enable(gl.DEPTH_TEST);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.viewport(0, 0, canvas.width, canvas.height);
-
-    gl.drawArrays(gl.LINES, 0, lines.length / 3);
+    scene = new THREE.Scene().add(group);
 };
 
-export const drawLinesThreeJs = (renderer, lines) => {
+const createCamera = (renderer) => {
     const size = new THREE.Vector2();
     renderer.getSize(size);
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight /*size[0] / size[1]*/, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+        75, size.width / size.height, 0.1, 1000
+    );
+    camera.position.set(0, 10, 0);
+    camera.rotation.set(-Math.PI / 2, 0, Math.PI);
+    time = 0;
 
-    lines.forEach(([ from_pos, to_pos ]) => {
-        const pos = [ 
-            (from_pos[0] + to_pos[0]) / 2,
-            (from_pos[1] + to_pos[1]) / 2,
-            (from_pos[2] + to_pos[2]) / 2
-        ];
-        const dir = [ 
-            to_pos[0] - from_pos[0],
-            to_pos[1] - from_pos[1],
-            to_pos[2] - from_pos[2]
-        ];
-        const len = Math.sqrt(
-              dir[0] * dir[0]
-            + dir[1] * dir[1]
-            + dir[2] * dir[2]
-        );
-        const rad = 0.1;
-        
-        const geometry = new THREE.CylinderGeometry(rad, rad, len);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
-        const cylinder = new THREE.Mesh(geometry, material);
-        cylinder.position.set(pos[0], pos[2], pos[1]);
-        // cylinder.lookAt(dir);
-
-        scene.add(cylinder);
-    });
-
-    camera.position.z = 5;
-
-    renderer.render(scene, camera);
-
-    console.log({renderer})
+    return camera;
 };
+
+export const startStationary = (renderer) => {
+    if (!scene) return;
+
+    const camera = createCamera(renderer);
+    renderer.render(scene, camera);
+};
+
+export const startAnimation = (renderer) => {
+    if (!scene || anim_ref) return;
+
+    const camera = createCamera(renderer);
+
+    const animate = () => {
+        anim_ref = requestAnimationFrame(animate);
+        
+        const angle = time++ / 75;
+        camera.position.set(Math.sin(angle) * 10, Math.cos(angle) * 10, 0);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+        camera.up = Z_AXIS;
+
+        renderer.render(scene, camera);
+    };
+
+    animate();
+};
+
+export const stopAnimation = () => {
+    if (anim_ref) {
+        cancelAnimationFrame(anim_ref);
+        anim_ref = null;
+    }
+};
+
+// const pos = [ 
+//     (from_pos[0] + to_pos[0]) / 2,
+//     (from_pos[1] + to_pos[1]) / 2,
+//     (from_pos[2] + to_pos[2]) / 2
+// ];
+// const dir = [ 
+//     to_pos[0] - from_pos[0],
+//     to_pos[1] - from_pos[1],
+//     to_pos[2] - from_pos[2]
+// ];
+// const len = Math.sqrt(
+//       dir[0] * dir[0]
+//     + dir[1] * dir[1]
+//     + dir[2] * dir[2]
+// );
+// const look_at = new THREE.Vector3(
+//     dir[1] + pos[0],
+//     -dir[0] + pos[1],
+//     dir[2] + pos[2]
+// );
+// const rad = 0.01;
+
+// const geometry = new THREE.CylinderGeometry(rad, rad, len);
+// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
+// const cylinder = new THREE.Mesh(geometry, material);
+// cylinder.position.set(pos[0], pos[1], pos[2]);
+// cylinder.lookAt(look_at);
+
+// scene.add(cylinder);

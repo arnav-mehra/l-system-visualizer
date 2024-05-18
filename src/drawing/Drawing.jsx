@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { useEffect, useRef } from "react";
-import { drawLinesThreeJs, getTurtleLines } from "../script/logic";
+import { useEffect, useRef, useState } from "react";
+import { getTurtleLines, initScene, startAnimation, startStationary, stopAnimation } from "../script/logic";
 import Drawer from "../Drawer";
 
 const Drawing = ({
@@ -8,12 +8,13 @@ const Drawing = ({
   drawInitCtx,
   str
 }) => {
-  const canvasWrapperRef = useRef();
-  const rendererRef = useRef();
+  const canvasWrapperRef = useRef(null);
+  const rendererRef = useRef(null);
+  const [ rotating, setRotating ] = useState(false);
 
   useEffect(() => {
     if (rendererRef.current) return;
-    
+
     const canvas_wrapper = canvasWrapperRef.current;
     if (!canvas_wrapper) return;
     
@@ -23,23 +24,59 @@ const Drawing = ({
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
     canvas_wrapper.appendChild(renderer.domElement);
-
     rendererRef.current = renderer;
-  }, []);
+  }, [canvasWrapperRef]);
 
   useEffect(() => {
     const renderer = rendererRef.current;
     if (!renderer) return;
 
+    setRotating(false);
+    stopAnimation();
+
     const lines = getTurtleLines(str, drawInitCtx, drawInstrs);
-    drawLinesThreeJs(renderer, lines);
-  }, [drawInitCtx, drawInstrs, str, canvasWrapperRef]);
+    initScene(lines);
+
+    startStationary(renderer);
+  }, [drawInitCtx, drawInstrs, str, rendererRef]);
+
+  const toggleRotating = () => {
+    const renderer = rendererRef.current;
+    if (!renderer) return;
+
+    if (rotating) {
+      stopAnimation();
+      startStationary(renderer);
+    } else {
+      startAnimation(renderer);
+    }
+    setRotating(!rotating);
+  }
 
   return (
     <Drawer
       label="Drawing"
       startOpen={true}
     >
+      <div
+        style={{
+          background: "white",
+          margin: "4px",
+          padding: "4px",
+          borderRadius: "4px",
+          display: "flex",
+        }}
+      >
+        <div>
+          Rotate
+        </div>
+        <input
+          type="checkbox"
+          checked={rotating}
+          onChange={toggleRotating}
+        />
+      </div>
+
       <div
         ref={canvasWrapperRef}
         style={{

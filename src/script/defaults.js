@@ -8,34 +8,35 @@ export const FRACTAL_TREE = {
     },
     draw_init_ctx: {
         len: 0.05,
-        angle: 90.0,
-        pos: [ 0.0, -1.0, 0.0 ]
+        theta: 0.0,
+        phi: 0.0,
+        pos: [ 0.0, 0.0, 0.0 ]
     },
     draw_instrs: {
         "0": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
+                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
             )
         ],
         "1": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
+                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
             )
         ],
         "[": [
             new Instr(InstrTypes.PUSH_CTX, "null"),
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle + 45 })"
+                "(ctx) => ({ ...ctx, theta: ctx.theta + 45 })"
             )
         ],
         "]": [
             new Instr(InstrTypes.POP_CTX, "null"),
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle - 45 })"
+                "(ctx) => ({ ...ctx, theta: ctx.theta - 45 })"
             )
         ]
     }
@@ -48,26 +49,27 @@ export const KOCH_CURVE = {
     },
     draw_init_ctx: {
         len: 0.05,
-        angle: 0.0,
-        pos: [ -1.0, 0.0, 0.0 ]
+        theta: 270.0,
+        phi: 0.0,
+        pos: [ 0.0, 0.0, 0.0 ]
     },
     draw_instrs: {
         "F": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
+                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
             )
         ],
         "-": [
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle - 90 })"
+                "(ctx) => ({ ...ctx, theta: ctx.theta - 90 })"
             )
         ],
         "+": [
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle + 90 })"
+                "(ctx) => ({ ...ctx, theta: ctx.theta + 90 })"
             )
         ],
     }
@@ -81,32 +83,33 @@ export const SIERPINSKI_TRI = {
     },
     draw_init_ctx: {
         len: 0.05,
-        angle: 180.0,
-        pos: [ 0.75, -0.75, 0.0 ]
+        theta: 0.0,
+        phi: 0.0,
+        pos: [ 0.0, 0.0, 0.0 ]
     },
     draw_instrs: {
         "F": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
+                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
             )
         ],
         "G": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
+                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
             )
         ],
         "-": [
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle - 120 })"
+                "(ctx) => ({ ...ctx, theta: ctx.theta - 120 })"
             )
         ],
         "+": [
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle + 120 })"
+                "(ctx) => ({ ...ctx, theta: ctx.theta + 120 })"
             )
         ],
     }
@@ -119,15 +122,16 @@ export const FRACTAL_PLANT = {
         "F": "FF"
     },
     draw_init_ctx: {
-        len: 0.01,
-        angle: 45.0,
-        pos: [ -0.75, -0.75, 0.0 ]
+        len: 0.1,
+        theta: 0.0,
+        phi: 0.0,
+        pos: [ 0, 0, 0 ]
     },
     draw_instrs: {
         "F": [
             new Instr(
                 InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, 0, ctx.angle ])"
+                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
             )
         ],
         "[": [
@@ -139,13 +143,13 @@ export const FRACTAL_PLANT = {
         "-": [
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle - 25 })"
+                "(ctx) => ({ ...ctx, phi: ctx.phi + 10, theta: ctx.theta - 25 })"
             )
         ],
         "+": [
             new Instr(
                 InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, angle: ctx.angle + 25 })"
+                "(ctx) => ({ ...ctx, phi: ctx.phi + 10, theta: ctx.theta + 25 })"
             )
         ],
     }
