@@ -148,33 +148,3 @@ export const stopAnimation = () => {
         anim_ref = null;
     }
 };
-
-// const pos = [ 
-//     (from_pos[0] + to_pos[0]) / 2,
-//     (from_pos[1] + to_pos[1]) / 2,
-//     (from_pos[2] + to_pos[2]) / 2
-// ];
-// const dir = [ 
-//     to_pos[0] - from_pos[0],
-//     to_pos[1] - from_pos[1],
-//     to_pos[2] - from_pos[2]
-// ];
-// const len = Math.sqrt(
-//       dir[0] * dir[0]
-//     + dir[1] * dir[1]
-//     + dir[2] * dir[2]
-// );
-// const look_at = new THREE.Vector3(
-//     dir[1] + pos[0],
-//     -dir[0] + pos[1],
-//     dir[2] + pos[2]
-// );
-// const rad = 0.01;
-
-// const geometry = new THREE.CylinderGeometry(rad, rad, len);
-// const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
-// const cylinder = new THREE.Mesh(geometry, material);
-// cylinder.position.set(pos[0], pos[1], pos[2]);
-// cylinder.lookAt(look_at);
-
-// scene.add(cylinder);
