@@ -1,23 +1,5 @@
 import * as THREE from 'three';
-
-export const InstrTypes = {
-    DRAW_LINE: "draw_line",
-    TRANSFORM_CTX: "transform_ctx",
-    PUSH_CTX: "push_ctx",
-    POP_CTX: "pop_ctx"
-};
-
-export class Instr {
-    constructor(type, fn_str) {
-        this.type = type;
-        this.fn_str = fn_str;
-        try {
-            this.fn = eval(fn_str);
-        } catch (err) {
-            alert("Bad Instruction Function: ", err);
-        }
-    }
-}
+import { Draw, DrawLineInstr, PopInstr, PushInstr, SetInstr } from './dsl';
 
 export const getNext = (str, rules) => {
     let res = "";
@@ -27,45 +9,59 @@ export const getNext = (str, rules) => {
     return res;
 };
 
-export const getTurtleLines = (str, init_ctx, draw_instr) => {
+/**
+ * @param {String} str
+ * @param {Draw} draw_info
+*/
+export const getTurtleLines = (str, draw_info) => {
     let lines = [];
 
-    let curr_ctx = { ...init_ctx };
+    let curr_ctx = {
+        pos: [ 0.0, 0.0, 0.0 ],
+        ...draw_info.vars
+    };
     let stack = [];
 
     for (const ch of str) {
-        if (!draw_instr[ch]) continue;
+        if (!draw_info.instrs[ch]) continue;
 
-        for (const instr of draw_instr[ch]) {
-            switch (instr.type) {
-                case InstrTypes.TRANSFORM_CTX: {
-                    curr_ctx = instr.fn(curr_ctx);
-                    break;
-                }
-                case InstrTypes.DRAW_LINE: {
-                    const [ len, phi, theta ] = instr.fn(curr_ctx);
+        for (const instr of draw_info.instrs[ch]) {
+            if (instr instanceof SetInstr) {
+                curr_ctx[instr.key] = instr.transform(curr_ctx[instr.key]);
+            }
+            else if (instr instanceof DrawLineInstr) {
+                const len   = typeof instr.len   === 'string' ? curr_ctx[instr.len]   : instr.len;
+                const phi   = typeof instr.phi   === 'string' ? curr_ctx[instr.phi]   : instr.phi;
+                const theta = typeof instr.theta === 'string' ? curr_ctx[instr.theta] : instr.theta;
+                const color = typeof instr.color === 'string' ? curr_ctx[instr.color] : instr.color;
 
-                    const sin_theta = Math.sin(theta * Math.PI / 180);
-                    const cos_theta = Math.cos(theta * Math.PI / 180);
-                    const cos_phi = Math.cos(phi * Math.PI / 180);
-                    const sin_phi = Math.sin(phi * Math.PI / 180);
+                const sin_theta = Math.sin(theta * Math.PI / 180);
+                const cos_theta = Math.cos(theta * Math.PI / 180);
+                const cos_phi   = Math.cos(phi * Math.PI / 180);
+                const sin_phi   = Math.sin(phi * Math.PI / 180);
 
-                    const new_pos = [
-                        len * sin_theta * cos_phi + curr_ctx.pos[0],
-                        len * sin_theta * sin_phi + curr_ctx.pos[1],
-                        len * cos_theta           + curr_ctx.pos[2]
-                    ];
-                    lines.push([ curr_ctx.pos, new_pos ]);
-                    curr_ctx = { ...curr_ctx, pos: new_pos };
-                    break;
+                const from_pos = curr_ctx.pos;
+                const to_pos = [
+                    len * sin_theta * cos_phi + curr_ctx.pos[0],
+                    len * sin_theta * sin_phi + curr_ctx.pos[1],
+                    len * cos_theta           + curr_ctx.pos[2]
+                ];
+
+                lines.push({ from_pos, to_pos, color });
+                curr_ctx.pos = to_pos;
+            }
+            else if (instr instanceof PushInstr) {
+                if (instr.key) {
+                    stack.push(curr_ctx[instr.key]);
+                } else {
+                    stack.push({ ...curr_ctx });
                 }
-                case InstrTypes.PUSH_CTX: {
-                    stack.push(curr_ctx);
-                    break;
-                }
-                case InstrTypes.POP_CTX: {
+            }
+            else if (instr instanceof PopInstr) {
+                if (instr.key) {
+                    curr_ctx[instr.key] = stack.pop();
+                } else {
                     curr_ctx = stack.pop();
-                    break;
                 }
             }
         }
@@ -83,13 +79,13 @@ let time = 0;
 export const initScene = (lines) => {
     const group = new THREE.Group();
 
-    lines.forEach(([ from_pos, to_pos ]) => {
+    lines.forEach(({ from_pos, to_pos, color }) => {
         const points = [
             new THREE.Vector3(from_pos[0], from_pos[1], from_pos[2]),
             new THREE.Vector3(to_pos[0], to_pos[1], to_pos[2])
         ];
         const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); 
+        const material = new THREE.LineBasicMaterial({ color });
         const line = new THREE.Line(geometry, material);
         group.add(line);
     });

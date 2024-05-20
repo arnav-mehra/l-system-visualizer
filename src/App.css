@@ -39,7 +39,8 @@ button {
 }
 
 .form-label {
-    width: 100px;
+    width: 80px;
+    min-width: 80px;
 }
 
 button,
@@ -50,7 +51,9 @@ select {
     background: white;
     border: 1px solid gray;
     border-radius: 6px;
-    min-width: 32px;
+    /* min-width: 32px; */
+    /* min-height: 32px; */
+    margin: 0px;
 }
 
 button:hover,

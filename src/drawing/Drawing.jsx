@@ -1,11 +1,9 @@
 import * as THREE from 'three';
 import { useEffect, useRef, useState } from "react";
 import { getTurtleLines, initScene, startAnimation, startStationary, stopAnimation } from "../script/logic";
-import Drawer from "../Drawer";
 
 const Drawing = ({
-  drawInstrs,
-  drawInitCtx,
+  draw,
   str
 }) => {
   const canvasWrapperRef = useRef(null);
@@ -23,8 +21,11 @@ const Drawing = ({
 
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(width, height);
-    canvas_wrapper.appendChild(renderer.domElement);
     rendererRef.current = renderer;
+
+    const el = renderer.domElement;
+    el.style.width = "100%";
+    canvas_wrapper.appendChild(el);
   }, [canvasWrapperRef]);
 
   useEffect(() => {
@@ -34,11 +35,11 @@ const Drawing = ({
     setRotating(false);
     stopAnimation();
 
-    const lines = getTurtleLines(str, drawInitCtx, drawInstrs);
+    const lines = getTurtleLines(str, draw);
     initScene(lines);
 
     startStationary(renderer);
-  }, [drawInitCtx, drawInstrs, str, rendererRef]);
+  }, [draw, str, rendererRef]);
 
   const toggleRotating = () => {
     const renderer = rendererRef.current;
@@ -54,39 +55,34 @@ const Drawing = ({
   }
 
   return (
-    <Drawer
-      label="Drawing"
-      startOpen={true}
-    >
-      <div
-        style={{
-          background: "white",
-          margin: "4px",
-          padding: "4px",
-          borderRadius: "4px",
-          display: "flex",
-        }}
-      >
-        <div>
-          Rotate
-        </div>
-        <input
-          type="checkbox"
-          checked={rotating}
-          onChange={toggleRotating}
-        />
-      </div>
-
+    <>
       <div
         ref={canvasWrapperRef}
         style={{
           width: "100%",
           height: "800px",
-          border: "1px solid black"
+          border: "1px solid black",
+          position: "relative"
         }}
       >
+        <div
+          className="flex-row"
+          style={{
+            position: "absolute", background: "white",
+            margin: "6px", padding: "0px 4px", borderRadius: "4px"
+          }}
+        >
+          <div className="text">
+            Rotate
+          </div>
+          <input
+            type="checkbox"
+            checked={rotating}
+            onChange={toggleRotating}
+          />
+        </div>
       </div>
-    </Drawer>
+    </>
   )
 };
 
