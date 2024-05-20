@@ -215,50 +215,19 @@ export class PushInstr extends Instr {
 
 ////
 
-const make_system = () => new SystemBuilder();
-
-const draw = (system) => new DrawBuilder(system);
-
-export const example = () => {
-    const system = 
-        make_system()
-            .axiom("0")
-            .map("0").to("10")
-            .map("1").to("11")
-        .end
-    ;
-
-    const drawing =
-        draw(system._system)
-            .let("len").eq(0.1)
-            .let("phi").eq(0)
-            .let("theta").eq(0)
-            .on("0")
-                .draw_line
-                    .len("len")
-                    .phi("phi")
-                    .theta("theta")
-                    .color(0xff0000)
-                .push("len")
-                .push_all
-            .on("1")
-                .set("len").with(x => x + 10)
-                .pop("len")
-        .end
-    ;
-
-    return [ system, drawing ];
-};
-
 /** @returns {([System, Draw] | null)} */
 export const evalCode = (system_code, draw_code) => {
-    const code = `() => {
-        const system_builder = make_system().${system_code}.end;
-        const drawing_builder = draw(system_builder._system).${draw_code}.end;
-        return [ system_builder._system, drawing_builder._draw ];
-    }`;
-
     try {
+        const make_system = () => new SystemBuilder();
+        const draw = (system) => new DrawBuilder(system);
+        console.log({ make_system, draw });
+
+        const code = `() => {
+            const system_builder = make_system().${system_code}.end;
+            const drawing_builder = draw(system_builder._system).${draw_code}.end;
+            return [ system_builder._system, drawing_builder._draw ];
+        }`;
+
         return eval(code)();
     } catch (err) {
         alert(err);
