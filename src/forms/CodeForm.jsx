@@ -17,7 +17,6 @@ const CodeForm = ({
         if (!res) return;
 
         const [system, draw] = res;
-        console.log({ system, draw });
         onSubmit(system, draw);
     };
 
@@ -67,13 +66,10 @@ const CodeForm = ({
                         style={{ fontFamily: "Lucida Console" }}
                         spellCheck="false"
                     />
-                    <button onClick={onSave}>
-                        Save
-                    </button>
                 </div>
             </div>
 
-            <div className="light-divider" />
+            {/* <div className="light-divider" /> */}
 
             <div className="flex-row">
                 <div className="text form-label">
@@ -88,7 +84,7 @@ const CodeForm = ({
                         spellCheck="false"
                     />
                     <button onClick={onSave}>
-                        Save
+                        Save Code
                     </button>
                 </div>
             </div>

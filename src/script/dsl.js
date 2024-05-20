@@ -261,7 +261,7 @@ export const evalCode = (system_code, draw_code) => {
     try {
         return eval(code)();
     } catch (err) {
-        console.log(err);
+        alert(err);
         return null;
     }
 };
