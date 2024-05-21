@@ -107,16 +107,16 @@ const Drawing = ({
               Mag
             </div>
             <button
-              onClick={incMag}
-              style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
-            >
-              +
-            </button>
-            <button
               onClick={decMag}
               style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
             >
               -
+            </button>
+            <button
+              onClick={incMag}
+              style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
+            >
+              +
             </button>
           </div>
 
