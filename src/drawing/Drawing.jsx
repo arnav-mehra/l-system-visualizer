@@ -8,7 +8,17 @@ const Drawing = ({
 }) => {
   const canvasWrapperRef = useRef(null);
   const rendererRef = useRef(null);
+
   const [ rotating, setRotating ] = useState(false);
+  const [ mag, setMag ] = useState(10);
+
+  const incMag = () => {
+    setMag(mag + 2);
+  };
+
+  const decMag = () => {
+    setMag(mag == 2 ? 2 : mag - 2);
+  };
 
   useEffect(() => {
     if (rendererRef.current) return;
@@ -36,10 +46,10 @@ const Drawing = ({
     stopAnimation();
 
     const lines = getTurtleLines(str, draw);
-    initScene(lines);
+    initScene(lines, mag);
 
     startStationary(renderer);
-  }, [draw, str, rendererRef]);
+  }, [draw, str, rendererRef, mag]);
 
   const toggleRotating = () => {
     const renderer = rendererRef.current;
@@ -66,20 +76,50 @@ const Drawing = ({
         }}
       >
         <div
-          className="flex-row"
+          className="flex-col"
           style={{
-            position: "absolute", background: "white",
-            margin: "6px", padding: "0px 4px", borderRadius: "4px"
+            position: "absolute",
+            background: "white",
+            margin: "6px",
+            padding: "6px",
+            borderRadius: "4px"
           }}
         >
-          <div className="text">
-            Rotate
+          <div
+            className="flex-row"
+            style={{ alignItems: "center", justifyContent: "space-between" }}
+          >
+            <div className="text">
+              Rotate
+            </div>
+            <input
+              type="checkbox"
+              checked={rotating}
+              onChange={toggleRotating}
+            />
           </div>
-          <input
-            type="checkbox"
-            checked={rotating}
-            onChange={toggleRotating}
-          />
+
+          <div
+            className="flex-row"
+            style={{ alignItems: "center", justifyContent: "space-between" }}
+          >
+            <div className="text">
+              Mag
+            </div>
+            <button
+              onClick={incMag}
+              style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
+            >
+              +
+            </button>
+            <button
+              onClick={decMag}
+              style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
+            >
+              -
+            </button>
+          </div>
+
         </div>
       </div>
     </>

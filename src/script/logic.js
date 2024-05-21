@@ -76,7 +76,7 @@ let scene = null;
 let anim_ref = null;
 let time = 0;
 
-export const initScene = (lines) => {
+export const initScene = (lines, mag) => {
     const group = new THREE.Group();
 
     lines.forEach(({ from_pos, to_pos, color }) => {
@@ -94,7 +94,7 @@ export const initScene = (lines) => {
     const size = new THREE.Vector3();
     bbox.getSize(size);
     const max_dim = Math.max(size.x, size.y, size.z);
-    group.scale.setScalar(10.0 / max_dim);
+    group.scale.setScalar(mag / max_dim);
 
     const bbox_ = new THREE.Box3().setFromObject(group);
     const center = new THREE.Vector3();
