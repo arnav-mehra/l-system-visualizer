@@ -91,8 +91,14 @@ export const initScene = (lines) => {
     });
 
     const bbox = new THREE.Box3().setFromObject(group);
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+    const max_dim = Math.max(size.x, size.y, size.z);
+    group.scale.setScalar(10.0 / max_dim);
+
+    const bbox_ = new THREE.Box3().setFromObject(group);
     const center = new THREE.Vector3();
-    bbox.getCenter(center);
+    bbox_.getCenter(center);
     group.position.set(-center.x, -center.y, -center.z);
 
     scene = new THREE.Scene().add(group);
