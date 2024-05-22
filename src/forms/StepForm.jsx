@@ -36,7 +36,7 @@ const StepForm = ({
                 <div className="text form-label">
                     Step
                 </div>
-                <div className="flex-row">
+                <div className="flex-row" style={{ alignItems: "center" }}>
                     <Button
                         onClick={handleDecStep}
                         type="primary"
@@ -52,10 +52,15 @@ const StepForm = ({
                     <Button
                         onClick={handleIncStep}
                         type="primary"
+                        danger
                         ghost
                         icon={<PlusOutlined />}
                         shape="circle"
                     />
+
+                    <Paragraph type="danger" style={{ margin: 0 }}>
+                        Do not spam +, your computer will SUFFER.  
+                    </Paragraph>
                 </div>
             </div>
 
@@ -64,6 +69,15 @@ const StepForm = ({
             <div className="flex-row">
                 <div className="text form-label">
                     String
+                    <div>
+                        <span style={{ marginRight: 8, fontSize: 14 }}>
+                            Hide Full
+                        </span>
+                        <Checkbox
+                            checked={ellipsis}
+                            onChange={_ => setEllipsis(!ellipsis)}
+                        />
+                    </div>
                 </div>
                 <div
                     className="text"
@@ -71,17 +85,13 @@ const StepForm = ({
                         maxWidth: "calc(100% - 120px)"
                     }}
                 >
-                    <div>
-                        <span style={{ marginRight: 8 }}>
-                            Hide Full Text
-                        </span>
-                        <Checkbox
-                            checked={ellipsis}
-                            onChange={_ => setEllipsis(!ellipsis)}
-                        />
-                    </div>
-
-                    <Paragraph ellipsis={ellipsis}>
+                    <Paragraph
+                        ellipsis={{
+                            rows: 3,
+                            expanded: !ellipsis
+                        }}
+                        style={{ margin: 0 }}
+                    >
                         {strs.cache[strs.ptr]}
                     </Paragraph>
                 </div>

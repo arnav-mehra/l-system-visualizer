@@ -61,7 +61,7 @@ const CodeForm = ({
 
             <div className="flex-row">
                 <div className="text form-label">
-                    <span style={{ marginRight: 8 }}>
+                    <span style={{ marginRight: 6 }}>
                         System
                     </span>
                     <DocModal info={systemInfo}/>
@@ -81,7 +81,7 @@ const CodeForm = ({
 
             <div className="flex-row">
                 <div className="text form-label">
-                    <span style={{ marginRight: 8 }}>
+                    <span style={{ marginRight: 6 }}>
                         Draw
                     </span>
                     <DocModal info={drawInfo}/>
