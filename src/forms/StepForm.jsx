@@ -1,4 +1,8 @@
+import { Button, Checkbox, Switch } from "antd";
 import { getNext } from "../script/logic";
+import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import Paragraph from "antd/es/typography/Paragraph";
+import { useState } from "react";
 
 const StepForm = ({
     strs,
@@ -24,6 +28,8 @@ const StepForm = ({
         }
     };
 
+    const [ellipsis, setEllipsis] = useState(true);
+
     return (
         <>
             <div className="flex-row">
@@ -31,23 +37,25 @@ const StepForm = ({
                     Step
                 </div>
                 <div className="flex-row">
-                    <button
+                    <Button
                         onClick={handleDecStep}
-                        className="blue"
-                    >
-                        -
-                    </button>
+                        type="primary"
+                        ghost
+                        icon={<MinusOutlined />}
+                        shape="circle"
+                    />
 
                     <div className="text">
                         {strs.ptr}
                     </div>
 
-                    <button
+                    <Button
                         onClick={handleIncStep}
-                        className="blue"
-                    >
-                        +
-                    </button>
+                        type="primary"
+                        ghost
+                        icon={<PlusOutlined />}
+                        shape="circle"
+                    />
                 </div>
             </div>
 
@@ -55,18 +63,29 @@ const StepForm = ({
 
             <div className="flex-row">
                 <div className="text form-label">
-                    L-String
+                    String
                 </div>
                 <div
                     className="text"
                     style={{
-                        maxWidth: "calc(100% - 120px)",
-                        maxHeight: "90px",
-                        overflow: "hidden"
+                        maxWidth: "calc(100% - 120px)"
                     }}
                 >
-                    {strs.cache[strs.ptr]}
+                    <div>
+                        <span style={{ marginRight: 8 }}>
+                            Hide Full Text
+                        </span>
+                        <Checkbox
+                            checked={ellipsis}
+                            onChange={_ => setEllipsis(!ellipsis)}
+                        />
+                    </div>
+
+                    <Paragraph ellipsis={ellipsis}>
+                        {strs.cache[strs.ptr]}
+                    </Paragraph>
                 </div>
+
             </div>
         </>
     );

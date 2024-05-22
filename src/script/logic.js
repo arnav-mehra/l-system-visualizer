@@ -10,7 +10,7 @@ export const getNext = (str, rules) => {
 };
 
 /**
- * @param {String} str
+ * @param {string} str
  * @param {Draw} draw_info
 */
 export const getTurtleLines = (str, draw_info) => {

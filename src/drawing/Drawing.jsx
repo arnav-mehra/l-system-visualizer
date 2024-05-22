@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { useEffect, useRef, useState } from "react";
 import { getTurtleLines, initScene, startAnimation, startStationary, stopAnimation } from "../script/logic";
+import { Button, Checkbox } from 'antd';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 
 const Drawing = ({
   draw,
@@ -92,8 +94,8 @@ const Drawing = ({
             <div className="text">
               Rotate
             </div>
-            <input
-              type="checkbox"
+
+            <Checkbox
               checked={rotating}
               onChange={toggleRotating}
             />
@@ -106,18 +108,19 @@ const Drawing = ({
             <div className="text">
               Mag
             </div>
-            <button
+
+            <Button
               onClick={decMag}
-              style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
-            >
-              -
-            </button>
-            <button
+              icon={<MinusOutlined/>}
+              size="small"
+              shape="circle"
+            />
+            <Button
               onClick={incMag}
-              style={{ borderRadius: "50%", height: "20px", width: "20px", padding: "0px" }}
-            >
-              +
-            </button>
+              icon={<PlusOutlined/>}
+              size="small"
+              shape="circle"
+            />
           </div>
 
         </div>
