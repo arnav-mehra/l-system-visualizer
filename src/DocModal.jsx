@@ -6,7 +6,7 @@ import Title from 'antd/es/typography/Title';
 
 export const systemInfo = () => {
     Modal.info({
-        width: "80%",
+        width: "800px",
         title: 'System Code Docs',
         content: (
             <div>
@@ -49,18 +49,20 @@ export const systemInfo = () => {
 
 export const drawInfo = () => {
     Modal.info({
-        width: "80%",
+        width: "800px",
         title: 'Draw Code Docs',
         content: (
-            <div>
+            <div style={{ height: "60vh", overflowY: "scroll" }}>
                 <Title level={4}>
-                    Variables [Optional]
+                    Variables
                 </Title>
                 <Title level={5}>
                     Definition
                 </Title>
                 <Paragraph>
-                    Values usable during turtle drawing. Variable "pos" is always present, and represents the current position of the turtle.
+                    Values usable during turtle drawing.
+                    <br/>
+                    Variable "pos" is always present, and represents the current position of the turtle.
                 </Paragraph>
                 <Title level={5}>
                     How to Add
@@ -92,16 +94,21 @@ export const drawInfo = () => {
                     Definition
                 </Title>
                 <Paragraph>
-                    The turtle draws a line of the desired length, angle, and color, moving the the end position of the line.
+                    The turtle draws a line of the desired length, angle, and color, moving to the end position of the line.
                 </Paragraph>
                 <Title level={5}>
                     How to Add
                 </Title>
                 <Paragraph>
-                    .draw_line.len(NumericValue | VariableNameString)
-                              .theta(NumericValue | VariableNameString)
-                              .phi(NumericValue | VariableNameString)
-                              .color(NumericValue | VariableNameString)
+                    .draw_line
+                    <br/>
+                    .len(NumericValue | VariableNameString)
+                    <br/>
+                    .theta(NumericValue | VariableNameString)
+                    <br/>
+                    .phi(NumericValue | VariableNameString)
+                    <br/>
+                    .color(NumericValue | VariableNameString)
                 </Paragraph>
 
                 <Title level={4}>

@@ -36,7 +36,7 @@ const StepForm = ({
                 <div className="text form-label">
                     Step
                 </div>
-                <div className="flex-row" style={{ alignItems: "center" }}>
+                <div className="flex-row" style={{ alignItems: "center", width: "100%" }}>
                     <Button
                         onClick={handleDecStep}
                         type="primary"

@@ -41,7 +41,7 @@ const CodeForm = ({
                     Defaults
                 </div>
 
-                <div className="flex-row">
+                <div className="flex-row" style={{ width: "100%", flexWrap:"wrap" }}>
                     <Button onClick={_ => setDefault(FRACTAL_TREE_CODE)}>
                         Fractal Tree
                     </Button>
