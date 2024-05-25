@@ -28,10 +28,6 @@ const Drawing = ({
   }, [angle]);
 
   const startRotating = () => {
-    if (!scene || !camera || animRef) return;
-
-    camera = createCamera(rendererRef.current, angle);
-
     const animate = () => {
       animRef = requestAnimationFrame(animate);
       setAngle(a => (a + 1) % 360);
