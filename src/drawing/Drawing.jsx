@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { createCamera, getTurtleLines, initScene, setCameraAngle } from "../script/logic";
 import { Button, Checkbox, Slider, Switch } from 'antd';
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import useMag from './useMag';
 
 let scene;
 let camera;
@@ -16,8 +17,9 @@ const Drawing = ({
   const rendererRef = useRef(null);
 
   const [rotating, setRotating] = useState(false);
-  const [mag, setMag] = useState(10);
   const [angle, setAngle] = useState(0);  
+
+  const { MagCtrls, mag } = useMag();
 
   useEffect(() => {
     if (!camera) return;
@@ -45,14 +47,6 @@ const Drawing = ({
       animRef = null;
     }
     setRotating(false);
-  };
-
-  const incMag = () => {
-    setMag(mag + 2);
-  };
-
-  const decMag = () => {
-    setMag(mag == 2 ? 2 : mag - 2);
   };
 
   useEffect(() => {
@@ -132,27 +126,7 @@ const Drawing = ({
             />
           </div>
 
-          <div
-            className="flex-row"
-            style={{ alignItems: "center", justifyContent: "space-between" }}
-          >
-            <div className="text">
-              Mag
-            </div>
-
-            <Button
-              onClick={decMag}
-              icon={<MinusOutlined />}
-              size="small"
-              shape="circle"
-            />
-            <Button
-              onClick={incMag}
-              icon={<PlusOutlined />}
-              size="small"
-              shape="circle"
-            />
-          </div>
+          <MagCtrls/>
         </div>
 
         <div
