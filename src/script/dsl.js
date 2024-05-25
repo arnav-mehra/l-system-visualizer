@@ -99,10 +99,41 @@ class InstrsBuilder {
         return this._parent.on(key);
     }
 
+    // get turn() {
+    //     return new TurnBuilder(this._parent, this._key);
+    // }
+
     get end() {
         return this._parent.end;
     }
 }
+
+// class TurnBuilder extends InstrsBuilder {
+//     constructor(parent, key) {
+//         super(parent, key);
+//         this._instr = new TurnInstr();
+//         this._parent._draw.instrs[key].push(this._instr);
+//     }
+
+//     var(val) {
+//         this._instr.key = val;
+//     }
+
+//     yaw(val) {
+//         this._instr.yaw = val;
+//         return this;
+//     }
+
+//     pitch(val) {
+//         this._instr.pitch = val;
+//         return this;
+//     }
+
+//     roll(val) {
+//         this._instr.roll = val;
+//         return this;
+//     }
+// }
 
 class DrawLineBuilder extends InstrsBuilder {
     constructor(parent, key) {
@@ -113,16 +144,6 @@ class DrawLineBuilder extends InstrsBuilder {
 
     len(val) {
         this._instr.len = val;
-        return this;
-    }
-
-    theta(val) {
-        this._instr.theta = val;
-        return this;
-    }
-
-    phi(val) {
-        this._instr.phi = val;
         return this;
     }
 
@@ -139,8 +160,25 @@ class SetBuilder extends InstrsBuilder {
         this._parent._draw.instrs[key].push(this._instr);
     }
 
-    with(val) {
+    with(new_key) {
+        this._instr.add_key(new_key);
+        return this;
+    }
+
+    via(val) {
         this._instr.transform = val;
+        return this;
+    }
+
+    to(val) {
+        const idx = this._instr.add_key(val);
+        this._instr.transform = (...args) => args[idx];
+        return this;
+    }
+
+    add(val) {
+        const idx = this._instr.add_key(val);
+        this._instr.transform = (...args) => args[0] + args[idx];
         return this;
     }
 }
@@ -181,12 +219,20 @@ export class Draw {
 
 export class Instr {}
 
+// export class TurnInstr extends Instr {
+//     constructor() {
+//         super();
+//         this.key = null;
+//         this.yaw = 0.0;
+//         this.pitch = 0.0;
+//         this.roll = 0.0;
+//     }
+// }
+
 export class DrawLineInstr extends Instr {
     constructor() {
         super();
         this.len = 0.1;
-        this.theta = 0;
-        this.phi = 0;
         this.color = 0x00ff00;
     }
 }
@@ -194,8 +240,21 @@ export class DrawLineInstr extends Instr {
 export class SetInstr extends Instr {
     constructor(key) {
         super();
-        this.key = key;
+        this.arg_keys = [ key ];
+        this.set_key = key; 
         this.transform = x => x;
+    }
+
+    add_key(key) {
+        this.arg_keys.push(key);
+        return this.arg_keys.length - 1;
+    }
+
+    run(vars) {
+        const args = this.arg_keys.map(x =>
+            typeof x === 'string' ? vars[x] : x
+        );
+        return this.transform(...args);
     }
 }
 

@@ -63,6 +63,8 @@ export const drawInfo = () => {
                     Values usable during turtle drawing.
                     <br/>
                     Variable "pos" is always present, and represents the current position of the turtle.
+                    <br/>
+                    Variable "ori" is always present, and represents the current orientation of the turtle as [yaw, pitch, role]. Modify via
                 </Paragraph>
                 <Title level={5}>
                     How to Add

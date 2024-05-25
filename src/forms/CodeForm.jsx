@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 
-import { FRACTAL_PLANT_CODE, FRACTAL_TREE_CODE, KOCH_CURVE_CODE, SIERPINSKI_TRI_CODE } from '../script/defaults';
+import { DEFAULT_LIST } from '../script/defaults';
 import { evalCode } from '../script/dsl';
 import DocModal, { drawInfo, systemInfo } from '../DocModal';
 
@@ -13,7 +13,7 @@ const CodeForm = ({
     const [drawCode, setDrawCode] = useState("");
 
     useEffect(() => {
-        setDefault(FRACTAL_TREE_CODE);
+        setDefault(DEFAULT_LIST[0].code);
     }, []);
 
     const setCode = (system_code, draw_code) => {
@@ -42,18 +42,14 @@ const CodeForm = ({
                 </div>
 
                 <div className="flex-row" style={{ width: "100%", flexWrap:"wrap" }}>
-                    <Button onClick={_ => setDefault(FRACTAL_TREE_CODE)}>
-                        Fractal Tree
-                    </Button>
-                    <Button onClick={_ => setDefault(KOCH_CURVE_CODE)}>
-                        Koch Curve
-                    </Button>
-                    <Button onClick={_ => setDefault(SIERPINSKI_TRI_CODE)}>
-                        Sierpinski Triangle
-                    </Button>
-                    <Button onClick={_ => setDefault(FRACTAL_PLANT_CODE)}>
-                        Fractal Plant
-                    </Button>
+                    {DEFAULT_LIST.map(x => (
+                        <Button
+                            onClick={_ => setDefault(x.code)}
+                            key={x.label}
+                        >
+                            {x.label}
+                        </Button>
+                    ))}
                 </div>
             </div>
 
