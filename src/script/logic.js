@@ -119,6 +119,13 @@ const createCamera = (renderer) => {
     return camera;
 };
 
+const setCameraAngle = (camera) => {
+    const angle = time / 150;
+    camera.position.set(Math.sin(angle) * 10, Math.cos(angle) * 10, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.up = Z_AXIS;
+};
+
 export const startStationary = (renderer) => {
     if (!scene) return;
 
@@ -126,13 +133,6 @@ export const startStationary = (renderer) => {
     setCameraAngle(camera);
     renderer.render(scene, camera);
 };
-
-const setCameraAngle = (camera) => {
-    const angle = time / 150;
-    camera.position.set(Math.sin(angle) * 10, Math.cos(angle) * 10, 0);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-    camera.up = Z_AXIS;
-}
 
 export const startAnimation = (renderer) => {
     if (!scene || anim_ref) return;

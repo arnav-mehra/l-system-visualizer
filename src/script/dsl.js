@@ -150,6 +150,12 @@ class SetBuilder extends InstrsBuilder {
         this._instr.transform = (...args) => args[0] + args[idx];
         return this;
     }
+
+    sub(val) {
+        const idx = this._instr.add_key(val);
+        this._instr.transform = (...args) => args[0] - args[idx];
+        return this;
+    }
 }
 
 class PushBuilder extends InstrsBuilder {
