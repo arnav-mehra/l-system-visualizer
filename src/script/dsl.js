@@ -99,41 +99,10 @@ class InstrsBuilder {
         return this._parent.on(key);
     }
 
-    // get turn() {
-    //     return new TurnBuilder(this._parent, this._key);
-    // }
-
     get end() {
         return this._parent.end;
     }
 }
-
-// class TurnBuilder extends InstrsBuilder {
-//     constructor(parent, key) {
-//         super(parent, key);
-//         this._instr = new TurnInstr();
-//         this._parent._draw.instrs[key].push(this._instr);
-//     }
-
-//     var(val) {
-//         this._instr.key = val;
-//     }
-
-//     yaw(val) {
-//         this._instr.yaw = val;
-//         return this;
-//     }
-
-//     pitch(val) {
-//         this._instr.pitch = val;
-//         return this;
-//     }
-
-//     roll(val) {
-//         this._instr.roll = val;
-//         return this;
-//     }
-// }
 
 class DrawLineBuilder extends InstrsBuilder {
     constructor(parent, key) {
@@ -218,16 +187,6 @@ export class Draw {
 }
 
 export class Instr {}
-
-// export class TurnInstr extends Instr {
-//     constructor() {
-//         super();
-//         this.key = null;
-//         this.yaw = 0.0;
-//         this.pitch = 0.0;
-//         this.roll = 0.0;
-//     }
-// }
 
 export class DrawLineInstr extends Instr {
     constructor() {

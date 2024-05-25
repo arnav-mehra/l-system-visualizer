@@ -34,18 +34,6 @@ export const getTurtleLines = (str, draw_info) => {
             if (instr instanceof SetInstr) {
                 vars[instr.set_key] = instr.run(vars);
             }
-            // else if (instr instanceof TurnInstr) {
-            //     const _yaw   = typeof instr.yaw   === 'string' ? vars[instr.yaw]   : instr.yaw;
-            //     const _pitch = typeof instr.pitch === 'string' ? vars[instr.pitch] : instr.pitch;
-            //     const _roll  = typeof instr.roll  === 'string' ? vars[instr.roll]  : instr.roll;
-            //     const key = instr.key || "ori";
-
-            //     vars[key] = [
-            //         vars[key][0] + _yaw   * Math.PI / 180,
-            //         vars[key][1] + _pitch * Math.PI / 180,
-            //         vars[key][2] + _roll  * Math.PI / 180
-            //     ];
-            // }
             else if (instr instanceof DrawLineInstr) {
                 const len   = typeof instr.len   === 'string' ? vars[instr.len]   : instr.len;
                 const color = typeof instr.color === 'string' ? vars[instr.color] : instr.color;
