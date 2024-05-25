@@ -35,12 +35,12 @@ export const getTurtleLines = (str, draw_info) => {
                 vars[instr.set_key] = instr.run(vars);
             }
             else if (instr instanceof DrawLineInstr) {
-                const len   = typeof instr.len   === 'string' ? vars[instr.len]   : instr.len;
+                const len = typeof instr.len === 'string' ? vars[instr.len] : instr.len;
                 const color = typeof instr.color === 'string' ? vars[instr.color] : instr.color;
 
-                const x_rot = new THREE.Matrix4().makeRotationX(vars.yaw   * Math.PI / 180);
+                const x_rot = new THREE.Matrix4().makeRotationX(vars.yaw * Math.PI / 180);
                 const y_rot = new THREE.Matrix4().makeRotationY(vars.pitch * Math.PI / 180);
-                const z_rot = new THREE.Matrix4().makeRotationZ(vars.roll  * Math.PI / 180);
+                const z_rot = new THREE.Matrix4().makeRotationZ(vars.roll * Math.PI / 180);
                 const t = x_rot.multiply(y_rot).multiply(z_rot);
                 const new_dir = new THREE.Vector4(0, 0, 1, 0).applyMatrix4(t);
 
@@ -79,15 +79,11 @@ export const getTurtleLines = (str, draw_info) => {
     return lines;
 };
 
-let scene = null;
-let anim_ref = null;
-let time = 0;
-
 export const initScene = (lines, mag) => {
     const group = new THREE.Group();
 
     lines.forEach(({ from_pos, to_pos, color }) => {
-        const geometry = new THREE.BufferGeometry().setFromPoints([ from_pos, to_pos ]);
+        const geometry = new THREE.BufferGeometry().setFromPoints([from_pos, to_pos]);
         const material = new THREE.LineBasicMaterial({ color });
         const line = new THREE.Line(geometry, material);
         group.add(line);
@@ -104,54 +100,23 @@ export const initScene = (lines, mag) => {
     bbox_.getCenter(center);
     group.position.set(-center.x, -center.y, -center.z);
 
-    scene = new THREE.Scene().add(group);
+    return new THREE.Scene().add(group);
 };
 
-const createCamera = (renderer) => {
+export const setCameraAngle = (camera, angle) => {
+    const angle_rad = angle * Math.PI / 180;
+    camera.position.set(Math.sin(angle_rad) * 10, Math.cos(angle_rad) * 10, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.up = new THREE.Vector3(0, 0, 1);
+};
+
+export const createCamera = (renderer, angle) => {
     const size = new THREE.Vector2();
     renderer.getSize(size);
 
     const camera = new THREE.PerspectiveCamera(
         75, size.width / size.height, 0.1, 1000
     );
-    setCameraAngle(camera);
-
+    setCameraAngle(camera, angle);
     return camera;
-};
-
-const setCameraAngle = (camera) => {
-    const angle = time / 150;
-    camera.position.set(Math.sin(angle) * 10, Math.cos(angle) * 10, 0);
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-    camera.up = Z_AXIS;
-};
-
-export const startStationary = (renderer) => {
-    if (!scene) return;
-
-    const camera = createCamera(renderer);
-    setCameraAngle(camera);
-    renderer.render(scene, camera);
-};
-
-export const startAnimation = (renderer) => {
-    if (!scene || anim_ref) return;
-
-    const camera = createCamera(renderer);
-
-    const animate = () => {
-        anim_ref = requestAnimationFrame(animate);
-        setCameraAngle(camera);
-        time++;
-        renderer.render(scene, camera);
-    };
-
-    animate();
-};
-
-export const stopAnimation = () => {
-    if (anim_ref) {
-        cancelAnimationFrame(anim_ref);
-        anim_ref = null;
-    }
 };

@@ -62,15 +62,15 @@ export const drawInfo = () => {
                 <Paragraph>
                     Values usable during turtle drawing.
                     <br/>
-                    Variable "pos" is always present, and represents the current position of the turtle.
-                    <br/>
-                    Variable "ori" is always present, and represents the current orientation of the turtle as [yaw, pitch, role]. Modify via
+                    Variables x, y, z, yaw, pitch, roll are default, and represent the current position and orientation (with respect to each axis) of the turtle.
                 </Paragraph>
                 <Title level={5}>
                     How to Add
                 </Title>
                 <Paragraph>
-                    .let(VariableNameString).eq(InitialValue)
+                    .let(VariableNameString)
+                    <br/>
+                    .eq(InitialValue)
                 </Paragraph>
 
                 <Title level={4}>
@@ -86,7 +86,9 @@ export const drawInfo = () => {
                     How to Add
                 </Title>
                 <Paragraph>
-                    .on(Character)[Insert Instruction Chain]
+                    .on(Character)
+                    <br/>
+                    [Insert Instruction Chain]
                 </Paragraph>
 
                 <Title level={4}>
@@ -96,7 +98,7 @@ export const drawInfo = () => {
                     Definition
                 </Title>
                 <Paragraph>
-                    The turtle draws a line of the desired length, angle, and color, moving to the end position of the line.
+                    The turtle moves forward in the direction it is facing, drawing a line of the desired length and color.
                 </Paragraph>
                 <Title level={5}>
                     How to Add
@@ -105,10 +107,6 @@ export const drawInfo = () => {
                     .draw_line
                     <br/>
                     .len(NumericValue | VariableNameString)
-                    <br/>
-                    .theta(NumericValue | VariableNameString)
-                    <br/>
-                    .phi(NumericValue | VariableNameString)
                     <br/>
                     .color(NumericValue | VariableNameString)
                 </Paragraph>
@@ -120,13 +118,25 @@ export const drawInfo = () => {
                     Definition
                 </Title>
                 <Paragraph>
-                    Set the value of a variable.
+                    Set the value of a variable by setting a new value, adding to the current value, or providing a custom update method.
                 </Paragraph>
                 <Title level={5}>
                     How to Add
                 </Title>
                 <Paragraph>
-                    .set(VariableNameString).with(ValueTransformFunction)
+                    .set(SetVariableNameString)
+                    <br/>
+                    {`{`}
+                    <div style={{ marginLeft: 12 }}>
+                        .to(NumericValue | VariableNameString)
+                        <br/>
+                        | .add(NumericValue | VariableNameString)
+                        <br/>
+                        | {`{ .with(VariableNameString) }*`}
+                        <br/>
+                        &nbsp; .via(SetFunction: {`(SetVariableValue, ...WithVariableValues) => NewValue`})
+                    </div>
+                    {`}`}
                 </Paragraph>
 
                 <Title level={4}>
@@ -143,6 +153,7 @@ export const drawInfo = () => {
                 </Title>
                 <Paragraph>
                     .push(VariableNameString)
+                    <br/>
                     | .push_all
                 </Paragraph>
 
@@ -160,6 +171,7 @@ export const drawInfo = () => {
                 </Title>
                 <Paragraph>
                     .pop(VariableNameString)
+                    <br/>
                     | .pop_all
                 </Paragraph>
             </div>

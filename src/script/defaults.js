@@ -26,7 +26,6 @@ draw:
 .on("F")
     .draw_line.len("len")
 .on("-")
-    .turn.pitch(90)
     .set("pitch").add(90)
 .on("+")
     .set("pitch").add(-90)`

@@ -1,8 +1,12 @@
 import * as THREE from 'three';
 import { useEffect, useRef, useState } from "react";
-import { getTurtleLines, initScene, startAnimation, startStationary, stopAnimation } from "../script/logic";
-import { Button, Checkbox } from 'antd';
+import { createCamera, getTurtleLines, initScene, setCameraAngle } from "../script/logic";
+import { Button, Checkbox, Slider, Switch } from 'antd';
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+
+let scene;
+let camera;
+let animRef;
 
 const Drawing = ({
   draw,
@@ -11,8 +15,37 @@ const Drawing = ({
   const canvasWrapperRef = useRef(null);
   const rendererRef = useRef(null);
 
-  const [ rotating, setRotating ] = useState(false);
-  const [ mag, setMag ] = useState(10);
+  const [rotating, setRotating] = useState(false);
+  const [mag, setMag] = useState(10);
+  const [angle, setAngle] = useState(0);  
+
+  useEffect(() => {
+    if (!camera) return;
+    setCameraAngle(camera, angle);
+    rendererRef.current.render(scene, camera);
+  }, [angle]);
+
+  const startRotating = () => {
+    if (!scene || !camera || animRef) return;
+
+    camera = createCamera(rendererRef.current, angle);
+
+    const animate = () => {
+      animRef = requestAnimationFrame(animate);
+      setAngle(a => (a + 1) % 360);
+    };
+    animate();
+
+    setRotating(true);
+  };
+
+  const stopRotating = () => {
+    if (animRef) {
+      cancelAnimationFrame(animRef);
+      animRef = null;
+    }
+    setRotating(false);
+  };
 
   const incMag = () => {
     setMag(mag + 2);
@@ -27,7 +60,7 @@ const Drawing = ({
 
     const canvas_wrapper = canvasWrapperRef.current;
     if (!canvas_wrapper) return;
-    
+
     const width = canvas_wrapper.offsetWidth;
     const height = canvas_wrapper.offsetHeight;
 
@@ -41,30 +74,28 @@ const Drawing = ({
   }, [canvasWrapperRef]);
 
   useEffect(() => {
-    const renderer = rendererRef.current;
-    if (!renderer) return;
+    if (!rendererRef.current) return;
 
-    setRotating(false);
-    stopAnimation();
+    stopRotating();
 
     const lines = getTurtleLines(str, draw);
-    initScene(lines, mag);
+    scene = initScene(lines, mag);
 
-    startStationary(renderer);
+    camera = createCamera(rendererRef.current, angle);
+    setCameraAngle(camera, angle);
+
+    rendererRef.current.render(scene, camera);
   }, [draw, str, rendererRef, mag]);
 
   const toggleRotating = () => {
-    const renderer = rendererRef.current;
-    if (!renderer) return;
+    if (!rendererRef.current) return;
 
     if (rotating) {
-      stopAnimation();
-      startStationary(renderer);
+      stopRotating();
     } else {
-      startAnimation(renderer);
+      startRotating();
     }
-    setRotating(!rotating);
-  }
+  };
 
   return (
     <>
@@ -95,7 +126,7 @@ const Drawing = ({
               Rotate
             </div>
 
-            <Checkbox
+            <Switch
               checked={rotating}
               onChange={toggleRotating}
             />
@@ -111,18 +142,39 @@ const Drawing = ({
 
             <Button
               onClick={decMag}
-              icon={<MinusOutlined/>}
+              icon={<MinusOutlined />}
               size="small"
               shape="circle"
             />
             <Button
               onClick={incMag}
-              icon={<PlusOutlined/>}
+              icon={<PlusOutlined />}
               size="small"
               shape="circle"
             />
           </div>
+        </div>
 
+        <div
+          className="flex-row"
+          style={{
+            position: "absolute",
+            background: "white",
+            borderRadius: "4px",
+            right: 0,
+            margin: 6,
+            padding: "0 10px",
+            alignItems: "center"
+          }}
+        >
+          <Slider
+            value={angle}
+            min={0}
+            max={360}
+            onChange={e => setAngle(e)}
+            step={1}
+            style={{ width: 260 }}
+          />
         </div>
       </div>
     </>
