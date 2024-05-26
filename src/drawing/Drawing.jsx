@@ -17,7 +17,7 @@ const Drawing = ({
   const rendererRef = useRef(null);
 
   const [rotating, setRotating] = useState(false);
-  const [angle, setAngle] = useState(0);  
+  const [angle, setAngle] = useState(0);
 
   const { MagCtrls, mag } = useMag();
 
@@ -78,8 +78,6 @@ const Drawing = ({
   }, [draw, str, rendererRef, mag]);
 
   const toggleRotating = () => {
-    if (!rendererRef.current) return;
-
     if (rotating) {
       stopRotating();
     } else {
@@ -99,52 +97,58 @@ const Drawing = ({
         }}
       >
         <div
-          className="flex-col"
-          style={{
-            position: "absolute",
-            background: "white",
-            margin: "6px",
-            padding: "6px",
-            borderRadius: "4px"
-          }}
-        >
-          <div
-            className="flex-row"
-            style={{ alignItems: "center", justifyContent: "space-between" }}
-          >
-            <div className="text">
-              Rotate
-            </div>
-
-            <Switch
-              checked={rotating}
-              onChange={toggleRotating}
-            />
-          </div>
-
-          <MagCtrls/>
-        </div>
-
-        <div
           className="flex-row"
           style={{
             position: "absolute",
-            background: "white",
-            borderRadius: "4px",
-            right: 0,
-            margin: 6,
-            padding: "0 10px",
-            alignItems: "center"
+            justifyContent: "space-between",
+            width: "100%",
+            gap: 0
           }}
         >
-          <Slider
-            value={angle}
-            min={0}
-            max={360}
-            onChange={e => setAngle(e)}
-            step={1}
-            style={{ width: 260 }}
-          />
+          <div
+            className="flex-col"
+            style={{
+              background: "white",
+              margin: "6px",
+              padding: 6,
+              borderRadius: "4px"
+            }}
+          >
+            <div
+              className="flex-row"
+              style={{ alignItems: "center", justifyContent: "space-between" }}
+            >
+              <div className="text">
+                Rotate
+              </div>
+
+              <Switch
+                checked={rotating}
+                onChange={toggleRotating}
+              />
+            </div>
+
+            <MagCtrls />
+          </div>
+
+          <div
+            style={{
+              height: 34,
+              width: "100%",
+              background: "white",
+              borderRadius: 4,
+              padding: "0px 10px",
+              margin: 6
+            }}
+          >
+            <Slider
+              value={angle}
+              onChange={setAngle}
+              min={0}
+              max={360}
+              step={1}
+            />
+          </div>
         </div>
       </div>
     </>
