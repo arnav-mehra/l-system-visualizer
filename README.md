@@ -1,8 +1,15 @@
-# React + Vite
+Try it out here: https://l-sys-viz.netlify.app/
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+== What did I make?
 
-Currently, two official plugins are available:
+I made a web app to visualize l-systems via turtle graphics. Learn about l-systems here: https://en.wikipedia.org/wiki/L-system.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+To make specifying the l-system and turtle drawing procedure easier for the user, I  made a fairly simple declarative DSL.  
+
+== Why did I make this?
+
+Heard about the use of l-systems to produce vegetation meshes while looking at some graphics research and thought it seemed pretty neat.
+
+== How did I make this?
+
+React.js and three.js (for displaying 3D shit via WebGL).
