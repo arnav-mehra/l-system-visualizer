@@ -1,23 +1,9 @@
 import * as THREE from 'three';
+import { Draw, DrawLineInstr, PopInstr, PushInstr, SetInstr } from './dsl';
 
-export const InstrTypes = {
-    DRAW_LINE: "draw_line",
-    TRANSFORM_CTX: "transform_ctx",
-    PUSH_CTX: "push_ctx",
-    POP_CTX: "pop_ctx"
-};
-
-export class Instr {
-    constructor(type, fn_str) {
-        this.type = type;
-        this.fn_str = fn_str;
-        try {
-            this.fn = eval(fn_str);
-        } catch (err) {
-            alert("Bad Instruction Function: ", err);
-        }
-    }
-}
+const X_AXIS = new THREE.Vector3(1, 0, 0);
+const Y_AXIS = new THREE.Vector3(0, 1, 0);
+const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 export const getNext = (str, rules) => {
     let res = "";
@@ -27,45 +13,64 @@ export const getNext = (str, rules) => {
     return res;
 };
 
-export const getTurtleLines = (str, init_ctx, draw_instr) => {
+/**
+ * @param {string} str
+ * @param {Draw} draw_info
+*/
+export const getTurtleLines = (str, draw_info) => {
     let lines = [];
 
-    let curr_ctx = { ...init_ctx };
+    let vars = {
+        x: 0, y: 0, z: 0,
+        yaw: 0, pitch: 0, roll: 0,
+        ...draw_info.vars
+    };
     let stack = [];
 
     for (const ch of str) {
-        if (!draw_instr[ch]) continue;
+        if (!draw_info.instrs[ch]) continue;
 
-        for (const instr of draw_instr[ch]) {
-            switch (instr.type) {
-                case InstrTypes.TRANSFORM_CTX: {
-                    curr_ctx = instr.fn(curr_ctx);
-                    break;
-                }
-                case InstrTypes.DRAW_LINE: {
-                    const [ len, phi, theta ] = instr.fn(curr_ctx);
+        for (const instr of draw_info.instrs[ch]) {
+            if (instr instanceof SetInstr) {
+                vars[instr.set_key] = instr.run(vars);
+            }
+            else if (instr instanceof DrawLineInstr) {
+                const len = typeof instr.len === 'string' ? vars[instr.len] : instr.len;
+                const color = typeof instr.color === 'string' ? vars[instr.color] : instr.color;
 
-                    const sin_theta = Math.sin(theta * Math.PI / 180);
-                    const cos_theta = Math.cos(theta * Math.PI / 180);
-                    const cos_phi = Math.cos(phi * Math.PI / 180);
-                    const sin_phi = Math.sin(phi * Math.PI / 180);
+                const x_rot = new THREE.Matrix4().makeRotationX(vars.yaw * Math.PI / 180);
+                const y_rot = new THREE.Matrix4().makeRotationY(vars.pitch * Math.PI / 180);
+                const z_rot = new THREE.Matrix4().makeRotationZ(vars.roll * Math.PI / 180);
+                const t = x_rot.multiply(y_rot).multiply(z_rot);
+                const new_dir = new THREE.Vector4(0, 0, 1, 0).applyMatrix4(t);
 
-                    const new_pos = [
-                        len * sin_theta * cos_phi + curr_ctx.pos[0],
-                        len * sin_theta * sin_phi + curr_ctx.pos[1],
-                        len * cos_theta           + curr_ctx.pos[2]
-                    ];
-                    lines.push([ curr_ctx.pos, new_pos ]);
-                    curr_ctx = { ...curr_ctx, pos: new_pos };
-                    break;
+                const from_pos = new THREE.Vector3(
+                    vars.x, vars.y, vars.z
+                );
+                const to_pos = new THREE.Vector3(
+                    len * new_dir.x + vars.x,
+                    len * new_dir.y + vars.y,
+                    len * new_dir.z + vars.z
+                );
+
+                lines.push({ from_pos, to_pos, color });
+
+                vars.x = to_pos.x;
+                vars.y = to_pos.y;
+                vars.z = to_pos.z;
+            }
+            else if (instr instanceof PushInstr) {
+                if (instr.key) {
+                    stack.push(vars[instr.key]);
+                } else {
+                    stack.push({ ...vars });
                 }
-                case InstrTypes.PUSH_CTX: {
-                    stack.push(curr_ctx);
-                    break;
-                }
-                case InstrTypes.POP_CTX: {
-                    curr_ctx = stack.pop();
-                    break;
+            }
+            else if (instr instanceof PopInstr) {
+                if (instr.key) {
+                    vars[instr.key] = stack.pop();
+                } else {
+                    vars = stack.pop();
                 }
             }
         }
@@ -74,77 +79,44 @@ export const getTurtleLines = (str, init_ctx, draw_instr) => {
     return lines;
 };
 
-const Z_AXIS = new THREE.Vector3(0, 0, 1);
-
-let scene = null;
-let anim_ref = null;
-let time = 0;
-
-export const initScene = (lines) => {
+export const initScene = (lines, mag) => {
     const group = new THREE.Group();
 
-    lines.forEach(([ from_pos, to_pos ]) => {
-        const points = [
-            new THREE.Vector3(from_pos[0], from_pos[1], from_pos[2]),
-            new THREE.Vector3(to_pos[0], to_pos[1], to_pos[2])
-        ];
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
-        const material = new THREE.LineBasicMaterial({ color: 0x0000ff }); 
+    lines.forEach(({ from_pos, to_pos, color }) => {
+        const geometry = new THREE.BufferGeometry().setFromPoints([from_pos, to_pos]);
+        const material = new THREE.LineBasicMaterial({ color });
         const line = new THREE.Line(geometry, material);
         group.add(line);
     });
 
     const bbox = new THREE.Box3().setFromObject(group);
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+    const max_dim = Math.max(size.x, size.y, size.z);
+    group.scale.setScalar(mag / max_dim);
+
+    const bbox_ = new THREE.Box3().setFromObject(group);
     const center = new THREE.Vector3();
-    bbox.getCenter(center);
+    bbox_.getCenter(center);
     group.position.set(-center.x, -center.y, -center.z);
 
-    scene = new THREE.Scene().add(group);
+    return new THREE.Scene().add(group);
 };
 
-const createCamera = (renderer) => {
+export const setCameraAngle = (camera, angle) => {
+    const angle_rad = angle * Math.PI / 180;
+    camera.position.set(Math.sin(angle_rad) * 10, Math.cos(angle_rad) * 10, 0);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.up = new THREE.Vector3(0, 0, 1);
+};
+
+export const createCamera = (renderer, angle) => {
     const size = new THREE.Vector2();
     renderer.getSize(size);
 
     const camera = new THREE.PerspectiveCamera(
         75, size.width / size.height, 0.1, 1000
     );
-    camera.position.set(0, 10, 0);
-    camera.rotation.set(-Math.PI / 2, 0, Math.PI);
-    time = 0;
-
+    setCameraAngle(camera, angle);
     return camera;
-};
-
-export const startStationary = (renderer) => {
-    if (!scene) return;
-
-    const camera = createCamera(renderer);
-    renderer.render(scene, camera);
-};
-
-export const startAnimation = (renderer) => {
-    if (!scene || anim_ref) return;
-
-    const camera = createCamera(renderer);
-
-    const animate = () => {
-        anim_ref = requestAnimationFrame(animate);
-        
-        const angle = time++ / 75;
-        camera.position.set(Math.sin(angle) * 10, Math.cos(angle) * 10, 0);
-        camera.lookAt(new THREE.Vector3(0, 0, 0));
-        camera.up = Z_AXIS;
-
-        renderer.render(scene, camera);
-    };
-
-    animate();
-};
-
-export const stopAnimation = () => {
-    if (anim_ref) {
-        cancelAnimationFrame(anim_ref);
-        anim_ref = null;
-    }
 };

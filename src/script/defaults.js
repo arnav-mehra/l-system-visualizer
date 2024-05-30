@@ -1,156 +1,114 @@
-import { Instr, InstrTypes } from "./logic";
-
-export const FRACTAL_TREE = {
-    axiom: "0",
-    rules: {
-        "0": "1[0]0",
-        "1": "11"
-    },
-    draw_init_ctx: {
-        len: 0.05,
-        theta: 0.0,
-        phi: 0.0,
-        pos: [ 0.0, 0.0, 0.0 ]
-    },
-    draw_instrs: {
-        "0": [
-            new Instr(
-                InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
-            )
-        ],
-        "1": [
-            new Instr(
-                InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
-            )
-        ],
-        "[": [
-            new Instr(InstrTypes.PUSH_CTX, "null"),
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, theta: ctx.theta + 45 })"
-            )
-        ],
-        "]": [
-            new Instr(InstrTypes.POP_CTX, "null"),
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, theta: ctx.theta - 45 })"
-            )
-        ]
-    }
+const FRACTAL_TREE_CODE = {
+system:
+`axiom("0")
+.map("0").to("1[0]0")
+.map("1").to("11")`,
+draw:
+`let("len").eq(0.05)
+.on("0")
+    .draw_line.len("len")
+.on("1")
+    .draw_line.len("len")
+.on("[")
+    .push_all
+    .set("pitch").add(45)
+.on("]")
+    .pop_all
+    .set("pitch").add(-45)`
 };
 
-export const KOCH_CURVE = {
-    axiom: "F",
-    rules: {
-        "F": "F+F-F-F+F"
-    },
-    draw_init_ctx: {
-        len: 0.05,
-        theta: 270.0,
-        phi: 0.0,
-        pos: [ 0.0, 0.0, 0.0 ]
-    },
-    draw_instrs: {
-        "F": [
-            new Instr(
-                InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
-            )
-        ],
-        "-": [
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, theta: ctx.theta - 90 })"
-            )
-        ],
-        "+": [
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, theta: ctx.theta + 90 })"
-            )
-        ],
-    }
+const KOCH_CURVE_CODE = {
+system:
+`axiom("F")
+.map("F").to("F+F-F-F+F")`,
+draw:
+`let("len").eq(0.05)
+.on("F")
+    .draw_line.len("len")
+.on("-")
+    .set("pitch").add(90)
+.on("+")
+    .set("pitch").add(-90)`
 };
 
-export const SIERPINSKI_TRI = {
-    axiom: "F-G-G",
-    rules: {
-        "F": "F-G+F+G-F",
-        "G": "GG"
-    },
-    draw_init_ctx: {
-        len: 0.05,
-        theta: 0.0,
-        phi: 0.0,
-        pos: [ 0.0, 0.0, 0.0 ]
-    },
-    draw_instrs: {
-        "F": [
-            new Instr(
-                InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
-            )
-        ],
-        "G": [
-            new Instr(
-                InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
-            )
-        ],
-        "-": [
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, theta: ctx.theta - 120 })"
-            )
-        ],
-        "+": [
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, theta: ctx.theta + 120 })"
-            )
-        ],
-    }
+const SIERPINSKI_TRI_CODE = {
+system:
+`axiom("F-G-G")
+.map("F").to("F-G+F+G-F")
+.map("G").to("GG")`,
+draw:
+`let("len").eq(0.05)
+.on("F")
+    .draw_line.len("len")
+.on("G")
+    .draw_line.len("len")
+.on("-")
+    .set("pitch").add(-120)
+.on("+")
+    .set("pitch").add(120)`
 };
 
-export const FRACTAL_PLANT = {
-    axiom: "X",
-    rules: {
-        "X": "F+[[X]-X]-F[-FX]+X",
-        "F": "FF"
-    },
-    draw_init_ctx: {
-        len: 0.1,
-        theta: 0.0,
-        phi: 0.0,
-        pos: [ 0, 0, 0 ]
-    },
-    draw_instrs: {
-        "F": [
-            new Instr(
-                InstrTypes.DRAW_LINE,
-                "(ctx) => ([ ctx.len, ctx.phi, ctx.theta ])"
-            )
-        ],
-        "[": [
-            new Instr(InstrTypes.PUSH_CTX, "null")
-        ],
-        "]": [
-            new Instr(InstrTypes.POP_CTX, "null")
-        ],
-        "-": [
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, phi: ctx.phi + 10, theta: ctx.theta - 25 })"
-            )
-        ],
-        "+": [
-            new Instr(
-                InstrTypes.TRANSFORM_CTX,
-                "(ctx) => ({ ...ctx, phi: ctx.phi + 10, theta: ctx.theta + 25 })"
-            )
-        ],
-    }
+const FRACTAL_PLANT_CODE = {
+system:
+`axiom("X")
+.map("X").to("F+[[X]-X]-F[-FX]+X")
+.map("F").to("FF")`,
+draw:
+`let("len").eq(0.05)
+.let("theta").eq(0.0)
+.let("phi").eq(0.0)
+.on("F")
+    .draw_line.len("len")
+.on("[")
+    .push_all
+.on("]")
+    .pop_all
+.on("-")
+    .set("pitch").add(-25)
+    .set("roll").add(10)
+.on("+")
+    .set("pitch").add(25)
+    .set("roll").add(10)`
 };
+
+const PLANT_3D_CODE = {
+system:
+`axiom("F")
+.map("F").to("F [ & + F] F [ - > F][- > F][& F]")`,
+draw:
+`let("len").eq(0.05)
+.let("a").eq(28)
+.let("na").eq(-28)
+.on("F").draw_line.len("len")
+.on("[").push_all
+.on("]").pop_all
+.on("+").set("yaw").add(28)
+.on("-").set("yaw").add(-28)
+.on("&").set("pitch").add(28)
+.on("^").set("pitch").add(-28)
+.on("<").set("roll").add(28)
+.on(">").set("roll").add(-28)`
+};
+
+export const DEFAULT_LIST = [
+    {
+        label: "2D Tree",
+        code: FRACTAL_TREE_CODE
+    },
+    {
+        label: "Koch Curve",
+        code: KOCH_CURVE_CODE
+    },
+    {
+        label: "Sierpinski Triangle",
+        code: SIERPINSKI_TRI_CODE
+    },
+    {
+        label: "2D Plant",
+        code: FRACTAL_PLANT_CODE
+    },
+    {
+        label: "3D Plant",
+        code: PLANT_3D_CODE
+    }
+];

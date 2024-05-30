@@ -1,27 +1,14 @@
-import { useEffect, useState } from 'react';
-import { FRACTAL_PLANT, FRACTAL_TREE, KOCH_CURVE, SIERPINSKI_TRI } from './script/defaults';
-import DrawInstrsForm from './forms/DrawInstrsForm';
-import LSysForm from './forms/LSysForm';
+import { useState } from 'react';
+import { Draw, System } from './script/dsl';
+import CodeForm from './forms/CodeForm';
+import StepForm from './forms/StepForm';
 import Drawing from './drawing/Drawing';
 import './App.css';
 
 const App = () => {
-  const [ strs, setStrs ] = useState({ ptr: 0, cache: [""] });
-  const [ rules, setRules ] = useState({});
-  const [ drawInstrs, setDrawInstrs ] = useState({});
-  const [ drawInitCtx, setDrawInitCtx ] = useState({});
-
-  const setDefault = (def_obj) => {
-    console.log({def_obj})
-    setStrs({ ptr: 0, cache: [ def_obj.axiom ] });
-    setRules({ ...def_obj.rules });
-    setDrawInitCtx({ ...def_obj.draw_init_ctx });
-    setDrawInstrs({ ...def_obj.draw_instrs });
-  };
-
-  useEffect(() => {
-    setDefault(FRACTAL_TREE);
-  }, []);
+  const [strs, setStrs] = useState({ ptr: 0, cache: [""] });
+  const [system, setSystem] = useState(new System());
+  const [draw, setDraw] = useState(new Draw());
 
   return (
     <div
@@ -37,45 +24,32 @@ const App = () => {
         </h4>
       </div>
 
-      <div className="flex-row" style={{ justifyContent: "center", alignItems: "center" }}>
-        <div>
-          Defaults:
-        </div>
-        <button onClick={_ => setDefault(FRACTAL_TREE)}>
-          Fractal Tree
-        </button>
-        <button onClick={_ => setDefault(KOCH_CURVE)}>
-          Koch Curve
-        </button>
-        <button onClick={_ => setDefault(SIERPINSKI_TRI)}>
-          Sierpinski Triangle
-        </button>
-        <button onClick={_ => setDefault(FRACTAL_PLANT)}>
-          Fractal Plant
-        </button>
-      </div>
+      <div className="light-divider" />
 
-      <LSysForm
+      <CodeForm
+        onSubmit={(system, draw) => {
+          setStrs({ ptr: 0, cache: [system.axiom] });
+          setSystem(system);
+          setDraw(draw);
+        }}
+      />
+
+      <div className="light-divider" />
+
+      <StepForm
         strs={strs}
         setStrs={setStrs}
-        rules={rules}
-        setRules={setRules}
+        system={system}
       />
 
-      <DrawInstrsForm
-        drawInstrs={drawInstrs}
-        setDrawInstrs={setDrawInstrs}
-        drawInitCtx={drawInitCtx}
-        setDrawInitCtx={setDrawInitCtx}
-      />
+      <div className="light-divider" />
 
       <Drawing
-        drawInstrs={drawInstrs}
-        drawInitCtx={drawInitCtx}
+        draw={draw}
         str={strs.cache[strs.ptr]}
       />
 
-      <div className="divider"/>
+      <div className="divider" />
     </div>
   );
 };
